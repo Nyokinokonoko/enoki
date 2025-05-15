@@ -1,0 +1,34 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { contentfulClient } from "../../lib/contentful";
+import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
+import type { BlogPost } from "../../lib/contentful";
+
+export async function getStaticPaths() {
+  const entries = await contentfulClient.getEntries<BlogPost>({
+    content_type: "blogPost",
+  });
+
+  return entries.items.map(entry => ({
+    params: { slug: entry.fields.slug },
+    props: {
+      title: entry.fields.title,
+      date: entry.fields.date,
+      content: documentToHtmlString(entry.fields.content),
+    },
+  }));
+}
+
+const { title, date, content } = Astro.props;
+---
+<html lang="ja">
+  <head>
+    <title>{title}</title>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <h1>{title}</h1>
+    <time>{new Date(date).toLocaleDateString()}</time>
+    <article set:html={content} />
+  </body>
+</html>
