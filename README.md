@@ -1,2 +1,1 @@
-# enoki
-Frontend for my blog
+# Enoki
