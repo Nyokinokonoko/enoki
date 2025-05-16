@@ -9,11 +9,11 @@ export async function getStaticPaths() {
     content_type: "blogPost",
   });
 
-  return entries.items.map(entry => ({
+  return entries.items.map((entry) => ({
     params: { slug: entry.fields.slug },
     props: {
       title: entry.fields.title,
-      date: entry.fields.date,
+      date: entry.fields.publishDate,
       content: documentToHtmlString(entry.fields.content),
     },
   }));
@@ -21,6 +21,7 @@ export async function getStaticPaths() {
 
 const { title, date, content } = Astro.props;
 ---
+
 <html lang="ja">
   <head>
     <title>{title}</title>
