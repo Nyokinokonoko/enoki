@@ -12,14 +12,33 @@ export async function getStaticPaths() {
     content_type: "blogPost",
   });
 
-  return entries.items.map((entry) => ({
-    params: { slug: entry.fields.slug },
-    props: {
-      title: entry.fields.title,
-      date: entry.fields.publishDate,
-      content: marked(documentToHtmlString(entry.fields.content)),
-    },
-  }));
+  function addPrismLanguageClasses(html: string) {
+    return html.replace(
+      /<pre><code( class="[^"]*")?>([\s\S]*?)<\/code><\/pre>/g,
+      (match, classAttr, code) => {
+        // Try to extract language from the code fence (e.g., ```js\n)
+        const langMatch = code.match(/^([a-zA-Z0-9+-]+)\\n/);
+        let lang = langMatch ? langMatch[1] : null;
+        let cleanCode = lang ? code.replace(/^([a-zA-Z0-9+-]+)\\n/, "") : code;
+        let langClass = lang ? ` class=\"language-${lang}\"` : classAttr || "";
+        return `<pre><code${langClass}>${cleanCode}</code></pre>`;
+      }
+    );
+  }
+
+  const paths = await Promise.all(
+    entries.items.map(async (entry) => ({
+      params: { slug: entry.fields.slug },
+      props: {
+        title: entry.fields.title,
+        date: entry.fields.publishDate,
+        content: addPrismLanguageClasses(
+          await marked(documentToHtmlString(entry.fields.content))
+        ),
+      },
+    }))
+  );
+  return paths;
 }
 
 const { title, date, content } = Astro.props;
@@ -29,12 +48,7 @@ const { title, date, content } = Astro.props;
   <Fragment slot="head">
     <title>{title} | notes.kinokonoko.io</title>
   </Fragment>
-  <main class="max-w-3xl mx-auto px-4 py-8">
-    <a
-      href="/"
-      class="text-[var(--text-secondary)] hover:underline mb-4 inline-block"
-      >← Back to Posts</a
-    >
+  <main class="container max-w-3xl mx-auto px-4 py-8">
     <h1 class="text-4xl font-bold mb-2">{title}</h1>
     <time class="text-[var(--text-secondary)]"
       >{new Date(date).toLocaleDateString()}</time
