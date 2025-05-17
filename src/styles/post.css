@@ -1,0 +1,29 @@
+/* Styles for posts/[slug].astro */
+.main-post {
+  max-width: 48rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+.back-link {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  display: inline-block;
+}
+.back-link:hover {
+  text-decoration: underline;
+}
+.post-title {
+  font-size: 2.25rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.post-date {
+  color: var(--text-secondary);
+}
+.post-content {
+  margin-top: 2rem;
+}
