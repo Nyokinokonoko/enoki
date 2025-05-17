@@ -1,0 +1,31 @@
+---
+export interface BlogPost {
+  title: string;
+  slug: string;
+  date: string;
+}
+
+export interface Props {
+  posts: BlogPost[];
+}
+
+const { posts } = Astro.props;
+---
+
+<ul class="w-full max-w-2xl">
+  {
+    posts.map((post) => (
+      <li class="flex items-center py-2">
+        <time class="text-sm text-[var(--text-secondary)] min-w-[120px] text-left pr-4">
+          {post.date}
+        </time>
+        <a
+          href={`/posts/${post.slug}/`}
+          class="hover:underline text-[var(--text-primary)] text-base"
+        >
+          {post.title}
+        </a>
+      </li>
+    ))
+  }
+</ul>
