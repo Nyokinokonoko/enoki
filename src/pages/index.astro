@@ -19,22 +19,24 @@ const posts = entries.items.map((item) => {
 
 <Layout>
   <main>
-    <ul class="space-y-4">
-      {
-        posts.map((post) => (
-          <li class="p-4 rounded-lg bg-[var(--card-bg)] border border-[var(--border)]">
-            <a
-              href={`/posts/${post.slug}/`}
-              class="hover:text-[var(--text-secondary)]"
-            >
-              <h2 class="text-xl font-semibold">{post.title}</h2>
-            </a>
-            <time class="text-sm text-[var(--text-secondary)]">
-              {post.date}
-            </time>
-          </li>
-        ))
-      }
-    </ul>
+    <div class="flex justify-center">
+      <ul class="space-y-4 w-full max-w-2xl">
+        {
+          posts.map((post) => (
+            <li class="p-4 rounded-lg bg-[var(--card-bg)] border border-[var(--border)]">
+              <a
+                href={`/posts/${post.slug}/`}
+                class="flex items-center gap-4 hover:text-[var(--text-secondary)]"
+              >
+                <time class="text-sm text-[var(--text-secondary)] min-w-[100px] text-left">
+                  {post.date}
+                </time>
+                <h2 class="text-xl font-semibold flex-1">{post.title}</h2>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </main>
 </Layout>
