@@ -1,6 +1,7 @@
 ---
 import { contentfulClient } from "../lib/contentful";
 import type { BlogPost } from "../lib/contentful";
+import Layout from "../layouts/Layout.astro";
 
 const entries = await contentfulClient.getEntries<BlogPost>({
   content_type: "blogPost",
@@ -16,24 +17,25 @@ const posts = entries.items.map((item) => {
 });
 ---
 
-<html lang="ja">
-  <head>
-    <title>My Blog</title>
-    <meta charset="UTF-8" />
-  </head>
-  <body>
-    <h1>My Blog</h1>
-    <ul>
+<Layout>
+  <main>
+    <h1 class="text-3xl font-bold mb-6">My Blog</h1>
+    <ul class="space-y-4">
       {
         posts.map((post) => (
-          <li>
-            <a href={`/posts/${post.slug}/`}>
-              <h2>{post.title}</h2>
+          <li class="p-4 rounded-lg bg-[var(--card-bg)] border border-[var(--border)]">
+            <a
+              href={`/posts/${post.slug}/`}
+              class="hover:text-[var(--text-secondary)]"
+            >
+              <h2 class="text-xl font-semibold">{post.title}</h2>
             </a>
-            <time>{post.date}</time>
+            <time class="text-sm text-[var(--text-secondary)]">
+              {post.date}
+            </time>
           </li>
         ))
       }
     </ul>
-  </body>
-</html>
+  </main>
+</Layout>

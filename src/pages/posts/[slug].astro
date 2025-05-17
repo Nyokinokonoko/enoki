@@ -22,14 +22,20 @@ export async function getStaticPaths() {
 const { title, date, content } = Astro.props;
 ---
 
-<html lang="ja">
-  <head>
-    <title>{title}</title>
-    <meta charset="UTF-8" />
-  </head>
-  <body>
-    <h1>{title}</h1>
-    <time>{new Date(date).toLocaleDateString()}</time>
-    <article set:html={content} />
-  </body>
-</html>
+<Layout>
+  <main class="max-w-3xl mx-auto px-4 py-8">
+    <a
+      href="/"
+      class="text-[var(--text-secondary)] hover:underline mb-4 inline-block"
+      >← Back to Posts</a
+    >
+    <h1 class="text-4xl font-bold mb-2">{title}</h1>
+    <time class="text-[var(--text-secondary)]"
+      >{new Date(date).toLocaleDateString()}</time
+    >
+    <article
+      class="mt-8 prose prose-sm md:prose-base dark:prose-invert"
+      set:html={content}
+    />
+  </main>
+</Layout>
