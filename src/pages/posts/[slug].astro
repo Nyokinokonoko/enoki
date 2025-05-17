@@ -1,10 +1,8 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import { contentfulClient } from "../../lib/contentful";
-import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
 import type { BlogPost } from "../../lib/contentful";
 import { marked } from "marked";
-import Prism from "prismjs";
 import "prismjs/themes/prism-tomorrow.css";
 
 export async function getStaticPaths() {
@@ -32,9 +30,7 @@ export async function getStaticPaths() {
       props: {
         title: entry.fields.title,
         date: entry.fields.publishDate,
-        content: addPrismLanguageClasses(
-          await marked(documentToHtmlString(entry.fields.content))
-        ),
+        content: addPrismLanguageClasses(await marked(entry.fields.content)),
         tags: entry.fields.tags, // Ensure tags are fetched
       },
     }))
