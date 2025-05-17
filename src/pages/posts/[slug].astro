@@ -35,13 +35,14 @@ export async function getStaticPaths() {
         content: addPrismLanguageClasses(
           await marked(documentToHtmlString(entry.fields.content))
         ),
+        tags: entry.fields.tags, // Ensure tags are fetched
       },
     }))
   );
   return paths;
 }
 
-const { title, date, content } = Astro.props;
+const { title, date, content, tags } = Astro.props;
 ---
 
 <Layout>
@@ -50,9 +51,11 @@ const { title, date, content } = Astro.props;
   </Fragment>
   <main class="container max-w-3xl mx-auto px-4 py-8">
     <h1 class="text-4xl font-bold mb-2">{title}</h1>
-    <time class="text-[var(--text-secondary)]"
-      >{new Date(date).toLocaleDateString()}</time
-    >
+    <time class="text-[var(--text-secondary)]">
+      {new Date(date).toLocaleDateString()} | Tags: {
+        Array.isArray(tags) ? tags.join(", ") : tags
+      }
+    </time>
     <article
       class="mt-8 prose prose-sm md:prose-base dark:prose-invert"
       set:html={content}
