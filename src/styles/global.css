@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "./navbar.css";
+
 :root {
   --background: #ffffff;
   --text: #111827;
