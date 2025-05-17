@@ -3,6 +3,9 @@ import Layout from "../../layouts/Layout.astro";
 import { contentfulClient } from "../../lib/contentful";
 import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
 import type { BlogPost } from "../../lib/contentful";
+import { marked } from "marked";
+import Prism from "prismjs";
+import "prismjs/themes/prism-tomorrow.css";
 
 export async function getStaticPaths() {
   const entries = await contentfulClient.getEntries<BlogPost>({
@@ -14,7 +17,7 @@ export async function getStaticPaths() {
     props: {
       title: entry.fields.title,
       date: entry.fields.publishDate,
-      content: documentToHtmlString(entry.fields.content),
+      content: marked(documentToHtmlString(entry.fields.content)),
     },
   }));
 }
@@ -41,4 +44,8 @@ const { title, date, content } = Astro.props;
       set:html={content}
     />
   </main>
+  <script type="module">
+    import Prism from "prismjs";
+    Prism.highlightAll();
+  </script>
 </Layout>
