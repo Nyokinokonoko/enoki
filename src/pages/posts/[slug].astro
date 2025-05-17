@@ -81,8 +81,8 @@ const { title, date, content, tags } = Astro.props;
       set:html={content}
     />
   </main>
-  <script type="module">
-    import Prism from "prismjs";
-    Prism.highlightAll();
-  </script>
+  <!-- Load Prism.js for client-side syntax highlighting -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"
+    onload="Prism.highlightAll()"></script>
 </Layout>
