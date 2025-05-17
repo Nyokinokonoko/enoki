@@ -51,11 +51,31 @@ const { title, date, content, tags } = Astro.props;
   </Fragment>
   <main class="container max-w-3xl mx-auto px-4 py-8">
     <h1 class="text-4xl font-bold mb-2">{title}</h1>
-    <time class="text-[var(--text-secondary)]">
-      {new Date(date).toLocaleDateString()} | Tags: {
-        Array.isArray(tags) ? tags.join(", ") : tags
+    <div class="flex flex-wrap items-center gap-2 mb-2">
+      <span class="text-[var(--text-secondary)]">
+        {new Date(date).toLocaleDateString()}| Tags:&nbsp;
+      </span>
+      {
+        Array.isArray(tags) && tags.length > 0 ? (
+          tags.map((tag, i) => (
+            <>
+              <a
+                href={`/tags/${encodeURIComponent(tag.trim().toLowerCase())}/`}
+                class="underline hover:text-blue-500 text-[var(--text-secondary)]"
+                style="text-underline-offset: 2px; text-decoration-skip-ink: none;"
+              >
+                {tag}
+              </a>
+              {i < tags.length - 1 && (
+                <span class="text-[var(--text-secondary)]">,&nbsp</span>
+              )}
+            </>
+          ))
+        ) : (
+          <span class="text-[var(--text-secondary)]">None</span>
+        )
       }
-    </time>
+    </div>
     <article
       class="mt-8 prose prose-sm md:prose-base dark:prose-invert"
       set:html={content}

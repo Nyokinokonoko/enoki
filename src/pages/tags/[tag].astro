@@ -1,0 +1,68 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { contentfulClient } from "../../lib/contentful";
+import type { BlogPost } from "../../lib/contentful";
+import BlogList from "../../components/BlogList.astro";
+
+export async function getStaticPaths() {
+  // Get all unique tags from all blog posts
+  const entries = await contentfulClient.getEntries<BlogPost>({
+    content_type: "blogPost",
+  });
+  const tagSet = new Set<string>();
+  entries.items.forEach((entry) => {
+    (entry.fields.tags || []).forEach((tag) =>
+      tagSet.add(tag.trim().toLowerCase())
+    );
+  });
+  // Encode tags for URL safety
+  return Array.from(tagSet).map((tag) => ({
+    params: { tag: encodeURIComponent(tag) },
+  }));
+}
+
+const tag = (Astro.params.tag || "").toLowerCase();
+
+// Get all blog posts
+const entries = await contentfulClient.getEntries<BlogPost>({
+  content_type: "blogPost",
+});
+
+// Filter posts by tag
+const filteredPosts = entries.items.filter((item) => {
+  const tags = item.fields.tags || [];
+  return tags.some((t) => t.trim().toLowerCase() === tag);
+});
+
+const posts = filteredPosts.map((item) => {
+  const { title, publishDate, slug } = item.fields;
+  return {
+    title,
+    slug,
+    date: new Date(publishDate).toLocaleDateString(),
+  };
+});
+
+interface Post {
+  title: string;
+  slug: string;
+  date: string;
+  tags: string[];
+}
+---
+
+<Layout>
+  <Fragment slot="head">
+    <title>「{tag}」タグの投稿一覧 | notes.kinokonoko.io</title>
+  </Fragment>
+  <main class="container max-w-3xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-4">「{tag}」タグの投稿一覧</h1>
+    {
+      posts.length === 0 ? (
+        <p>このタグに該当する投稿はありません。</p>
+      ) : (
+        <BlogList posts={posts} />
+      )
+    }
+  </main>
+</Layout>
