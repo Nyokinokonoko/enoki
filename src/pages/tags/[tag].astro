@@ -1,20 +1,17 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { contentfulClient } from "../../lib/contentful";
-import type { BlogPost } from "../../lib/contentful";
+import { getAllPosts, getPostsByTag } from "../../lib/contentful";
 import BlogList from "../../components/BlogList.astro";
 
 export async function getStaticPaths() {
   // Get all unique tags from all blog posts
-  const entries = await contentfulClient.getEntries<BlogPost>({
-    content_type: "blogPost",
-  });
+  const allPosts = await getAllPosts();
   const tagSet = new Set<string>();
-  entries.items.forEach((entry) => {
-    (entry.fields.tags || []).forEach((tag) =>
-      tagSet.add(tag.trim().toLowerCase())
-    );
+
+  allPosts.forEach((post) => {
+    post.tags.forEach((tag) => tagSet.add(tag.trim().toLowerCase()));
   });
+
   // Encode tags for URL safety
   return Array.from(tagSet).map((tag) => ({
     params: { tag: encodeURIComponent(tag) },
@@ -22,33 +19,7 @@ export async function getStaticPaths() {
 }
 
 const tag = (Astro.params.tag || "").toLowerCase();
-
-// Get all blog posts
-const entries = await contentfulClient.getEntries<BlogPost>({
-  content_type: "blogPost",
-});
-
-// Filter posts by tag
-const filteredPosts = entries.items.filter((item) => {
-  const tags = item.fields.tags || [];
-  return tags.some((t) => t.trim().toLowerCase() === tag);
-});
-
-const posts = filteredPosts.map((item) => {
-  const { title, publishDate, slug } = item.fields;
-  return {
-    title,
-    slug,
-    date: new Date(publishDate).toLocaleDateString(),
-  };
-});
-
-interface Post {
-  title: string;
-  slug: string;
-  date: string;
-  tags: string[];
-}
+const posts = await getPostsByTag(tag);
 ---
 
 <Layout>

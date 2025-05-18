@@ -1,21 +1,23 @@
 ---
-import { contentfulClient } from "../lib/contentful";
-import type { BlogPost } from "../lib/contentful";
+import {
+  getAllPosts,
+  getPostsByTag,
+  getAvailableTags,
+} from "../lib/contentful";
 import Layout from "../layouts/Layout.astro";
 import BlogList from "../components/BlogList.astro";
+import CategoryToggle from "../components/CategoryToggle.astro";
 
-const entries = await contentfulClient.getEntries<BlogPost>({
-  content_type: "blogPost",
-});
+// Get the active tag from URL query parameter
+const url = new URL(Astro.request.url);
+const activeTag = url.searchParams.get("tag") || "all";
 
-const posts = entries.items.map((item) => {
-  const { title, publishDate, slug } = item.fields;
-  return {
-    title,
-    slug,
-    date: new Date(publishDate).toLocaleDateString(),
-  };
-});
+// Get all available tags and their post counts
+const availableTags = await getAvailableTags();
+
+// Get posts filtered by the active tag
+const posts =
+  activeTag === "all" ? await getAllPosts() : await getPostsByTag(activeTag);
 ---
 
 <Layout>
@@ -23,7 +25,8 @@ const posts = entries.items.map((item) => {
     <title>notes.kinokonoko.io</title>
   </Fragment>
   <main>
-    <div class="flex justify-center">
+    <div class="flex flex-col items-center">
+      <CategoryToggle activeTag={activeTag} availableTags={availableTags} />
       <BlogList posts={posts} />
     </div>
   </main>

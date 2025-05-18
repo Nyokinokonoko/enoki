@@ -1,0 +1,148 @@
+---
+import { CATEGORIES } from "../lib/contentful";
+
+export interface Props {
+  activeTag: string;
+  availableTags: Record<string, number>;
+}
+
+const { activeTag, availableTags } = Astro.props;
+---
+
+<div class="category-toggle-container">
+  <div class="category-toggle">
+    {
+      CATEGORIES.map((category) => {
+        const isActive = activeTag === category.id;
+        const isDisabled = availableTags[category.id] === 0;
+        return (
+          <a
+            href={isDisabled ? "#" : `/?tag=${category.id}`}
+            class={`category-option ${isActive ? "active" : ""} ${isDisabled ? "disabled" : ""}`}
+            data-category={category.id}
+            aria-disabled={isDisabled}
+          >
+            {category.label}
+          </a>
+        );
+      })
+    }
+    <div class="slider"></div>
+  </div>
+</div>
+
+<style>
+  .category-toggle-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    width: 100%;
+  }
+
+  .category-toggle {
+    position: relative;
+    display: flex;
+    background: var(--card-bg);
+    border-radius: 50px;
+    padding: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .category-option {
+    position: relative;
+    z-index: 1;
+    padding: 8px 16px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .category-option.active {
+    color: white;
+  }
+
+  .category-option.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .slider {
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    height: calc(100% - 8px);
+    border-radius: 50px;
+    background: var(--gradient-button);
+    transition: all 0.3s ease;
+    z-index: 0;
+  }
+</style>
+
+<script>
+  // Calculate initial position for the slider
+  function updateSlider() {
+    const activeOption = document.querySelector(
+      ".category-option.active"
+    ) as HTMLElement;
+    const slider = document.querySelector(".slider") as HTMLElement;
+
+    if (activeOption && slider) {
+      slider.style.width = `${activeOption.offsetWidth}px`;
+      slider.style.left = `${activeOption.offsetLeft}px`;
+    } else if (slider) {
+      // If no active option is found, default to the first option
+      const firstOption = document.querySelector(
+        ".category-option"
+      ) as HTMLElement;
+      if (firstOption) {
+        slider.style.width = `${firstOption.offsetWidth}px`;
+        slider.style.left = `${firstOption.offsetLeft}px`;
+      }
+    }
+  }
+
+  // Update slider position on load and after a short delay to ensure DOM is fully rendered
+  document.addEventListener("DOMContentLoaded", () => {
+    updateSlider();
+    // Run again after a short delay to ensure everything is rendered
+    setTimeout(updateSlider, 100);
+  });
+  window.addEventListener("resize", updateSlider);
+
+  // Add click event listeners to category options
+  document.addEventListener("DOMContentLoaded", () => {
+    const options = document.querySelectorAll(".category-option");
+    options.forEach((option) => {
+      option.addEventListener("click", (e) => {
+        const clickedOption = e.currentTarget as HTMLElement;
+
+        // Don't do anything if the option is disabled
+        if (
+          clickedOption.classList.contains("disabled") ||
+          clickedOption.getAttribute("aria-disabled") === "true"
+        ) {
+          e.preventDefault();
+          return;
+        }
+
+        // Update the slider position
+        const slider = document.querySelector(".slider") as HTMLElement;
+        if (slider) {
+          slider.style.width = `${clickedOption.offsetWidth}px`;
+          slider.style.left = `${clickedOption.offsetLeft}px`;
+        }
+
+        // Remove active class from all options
+        options.forEach((opt) => opt.classList.remove("active"));
+
+        // Add active class to clicked option
+        clickedOption.classList.add("active");
+      });
+    });
+  });
+</script>
