@@ -1,10 +1,11 @@
 ---
 import "../styles/global.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "../components/Navbar.astro";
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en" data-bs-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
@@ -14,13 +15,13 @@ import Navbar from "../components/Navbar.astro";
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap"
       rel="stylesheet"
-    />
-    <meta name="generator" content={Astro.generator} />
+    />    <meta name="generator" content={Astro.generator} />
     <slot name="head" />
   </head>
   <body>
     <Navbar />
     <slot />
+    <script is:inline src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
 

@@ -9,8 +9,8 @@ export interface Props {
 const { activeTag, availableTags } = Astro.props;
 ---
 
-<div class="category-toggle-container">
-  <div class="category-toggle">
+<div class="d-flex justify-content-center my-4 w-100">
+  <div class="btn-group category-toggle" role="group">
     {
       CATEGORIES.map((category) => {
         const isActive = activeTag === category.id;
@@ -18,16 +18,17 @@ const { activeTag, availableTags } = Astro.props;
         return (
           <a
             href={isDisabled ? "#" : `/?tag=${category.id}`}
-            class={`category-option ${isActive ? "active" : ""} ${isDisabled ? "disabled" : ""}`}
+            class={`btn ${isActive ? 'btn-primary active' : 'btn-outline-primary'} category-option ${isDisabled ? "disabled" : ""}`}
             data-category={category.id}
             aria-disabled={isDisabled}
+            role="button"
           >
             {category.label}
           </a>
         );
       })
     }
-    <div class="slider"></div>
+    <div class="slider d-none"></div>
   </div>
 </div>
 

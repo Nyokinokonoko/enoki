@@ -1,8 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @import "./navbar.css";
+@import "./article.css";
 
 :root {
   --background: #ffffff;
@@ -17,7 +14,7 @@
   --gradient-code-border: linear-gradient(155deg, #d83333 0%, #f041ff 18%, #f5cee7 45%);
 }
 
-html.dark {
+html[data-bs-theme="dark"] {
   --background: #1D1F21;
   --text: #f1f5f9;
   --text-secondary: #cbd5e1;
@@ -49,48 +46,5 @@ a {
   text-decoration: inherit;
 }
 
-/* Style links within markdown content */
-.prose a {
-  text-decoration: underline;
-  text-decoration-skip-ink: none;
-  text-underline-offset: 2px;
-  color: inherit;
-}
-
-.prose a:hover {
-  color: inherit;
-}
-
-.container {
-  width: 100%;
-  margin-right: auto;
-  margin-left: auto;
-  padding-right: 1rem;
-  padding-left: 1rem;
-}
-
-@media (min-width: 640px) {
-  .container {
-    max-width: 640px;
-  }
-}
-@media (min-width: 768px) {
-  .container {
-    max-width: 768px;
-  }
-}
-@media (min-width: 1024px) {
-  .container {
-    max-width: 1024px;
-  }
-}
-@media (min-width: 1280px) {
-  .container {
-    max-width: 1280px;
-  }
-}
-@media (min-width: 1536px) {
-  .container {
-    max-width: 1536px;
-  }
-}
+/* Style links within markdown content - now handled by article.css */
+/* Bootstrap will handle container classes */
