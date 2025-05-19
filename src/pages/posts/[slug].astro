@@ -9,29 +9,21 @@ export async function getStaticPaths() {
   const entries = await contentfulClient.getEntries<BlogPost>({
     content_type: "blogPost",
   });
-
-  function addPrismLanguageClasses(html: string) {
-    // First, handle code blocks with language specified in markdown (```language)
-    return html.replace(
+  function addPrismLanguageClasses(html: string): string {
+    // First, handle code blocks with syntax highlighting
+    let processedHtml = html.replace(
       /<pre><code( class="[^"]*")?>([\s\S]*?)<\/code><\/pre>/g,
       (match, classAttr, code) => {
-        // Check if there's already a language class
-        if (classAttr && classAttr.includes("language-")) {
-          return match; // Already has language class, leave it as is
-        }
+        let lang: string | null = null;
 
-        // Try to extract language from the first line (e.g., ```js)
         const firstLine = code.split("\n")[0];
         const langMatch = firstLine.match(/^```?([a-zA-Z0-9+-]+)/);
-
-        let lang = langMatch ? langMatch[1] : null;
-        let cleanCode = lang ? code.replace(/^```?[a-zA-Z0-9+-]+\n/, "") : code;
-
-        // If no language is detected, try to guess based on content
-        if (!lang) {
+        if (langMatch) {
+          lang = langMatch[1];
+          code = code.replace(/^```?[a-zA-Z0-9+-]+\n/, "");
+        } else {
           if (
             code.includes("function") ||
-            code.includes("var ") ||
             code.includes("const ") ||
             code.includes("let ")
           ) {
@@ -46,10 +38,18 @@ export async function getStaticPaths() {
           }
         }
 
-        let langClass = lang ? ` class="language-${lang}"` : classAttr || "";
-        return `<pre><code${langClass}>${cleanCode}</code></pre>`;
+        const langClass = lang ? ` class="language-${lang}"` : classAttr || "";
+        return `<pre><code${langClass}>${code}</code></pre>`;
       }
     );
+
+    // Then, ensure all hyperlinks have underline styling but retain their original color
+    processedHtml = processedHtml.replace(
+      /<a(.*?)href="(.*?)"(.*?)>(.*?)<\/a>/g,
+      '<a$1href="$2"$3 style="text-decoration: underline; text-underline-offset: 2px; text-decoration-skip-ink: none; color: inherit;">$4</a>'
+    );
+
+    return processedHtml;
   }
 
   const paths = await Promise.all(
@@ -58,7 +58,9 @@ export async function getStaticPaths() {
       props: {
         title: entry.fields.title,
         date: entry.fields.publishDate,
-        content: addPrismLanguageClasses(await marked(entry.fields.content)),
+        content: addPrismLanguageClasses(
+          await marked.parse(entry.fields.content)
+        ),
         tags: entry.fields.tags, // Ensure tags are fetched
       },
     }))

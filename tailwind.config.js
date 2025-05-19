@@ -6,7 +6,22 @@ export default {
       fontFamily: {
         sans: ['"Noto Sans JP"', "sans-serif"],
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            a: {
+              "text-decoration": "underline",
+              "text-decoration-skip-ink": "none",
+              "text-underline-offset": "2px",
+              color: "inherit",
+              "&:hover": {
+                color: "inherit",
+              },
+            },
+          },
+        },
+      },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/typography")],
 };

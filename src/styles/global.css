@@ -49,6 +49,18 @@ a {
   text-decoration: inherit;
 }
 
+/* Style links within markdown content */
+.prose a {
+  text-decoration: underline;
+  text-decoration-skip-ink: none;
+  text-underline-offset: 2px;
+  color: inherit;
+}
+
+.prose a:hover {
+  color: inherit;
+}
+
 .container {
   width: 100%;
   margin-right: auto;
