@@ -11,14 +11,42 @@ export async function getStaticPaths() {
   });
 
   function addPrismLanguageClasses(html: string) {
+    // First, handle code blocks with language specified in markdown (```language)
     return html.replace(
       /<pre><code( class="[^"]*")?>([\s\S]*?)<\/code><\/pre>/g,
       (match, classAttr, code) => {
-        // Try to extract language from the code fence (e.g., ```js\n)
-        const langMatch = code.match(/^([a-zA-Z0-9+-]+)\\n/);
+        // Check if there's already a language class
+        if (classAttr && classAttr.includes("language-")) {
+          return match; // Already has language class, leave it as is
+        }
+
+        // Try to extract language from the first line (e.g., ```js)
+        const firstLine = code.split("\n")[0];
+        const langMatch = firstLine.match(/^```?([a-zA-Z0-9+-]+)/);
+
         let lang = langMatch ? langMatch[1] : null;
-        let cleanCode = lang ? code.replace(/^([a-zA-Z0-9+-]+)\\n/, "") : code;
-        let langClass = lang ? ` class=\"language-${lang}\"` : classAttr || "";
+        let cleanCode = lang ? code.replace(/^```?[a-zA-Z0-9+-]+\n/, "") : code;
+
+        // If no language is detected, try to guess based on content
+        if (!lang) {
+          if (
+            code.includes("function") ||
+            code.includes("var ") ||
+            code.includes("const ") ||
+            code.includes("let ")
+          ) {
+            lang = "javascript";
+          } else if (code.includes("#include") || code.includes("int main(")) {
+            lang = "cpp";
+          } else if (
+            code.includes("using System;") ||
+            code.includes("namespace ")
+          ) {
+            lang = "csharp";
+          }
+        }
+
+        let langClass = lang ? ` class="language-${lang}"` : classAttr || "";
         return `<pre><code${langClass}>${cleanCode}</code></pre>`;
       }
     );
@@ -44,6 +72,11 @@ const { title, date, content, tags } = Astro.props;
 <Layout>
   <Fragment slot="head">
     <title>{title} | notes.kinokonoko.io</title>
+    <!-- Import Prism CSS in the head -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css"
+    />
   </Fragment>
   <main class="container max-w-3xl mx-auto px-4 py-8">
     <h1 class="text-4xl font-bold mb-2">{title}</h1>
@@ -77,8 +110,50 @@ const { title, date, content, tags } = Astro.props;
       set:html={content}
     />
   </main>
-  <!-- Load Prism.js for client-side syntax highlighting -->
+  <!-- Load Prism.js and language components for client-side syntax highlighting -->
   <script
-    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"
-    onload="Prism.highlightAll()"></script>
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-csharp.min.js"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-c.min.js"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-cpp.min.js"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-objectivec.min.js"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-swift.min.js"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"
+  ></script>
+  <script is:inline>
+    // Run highlighting once the DOM is fully loaded
+    document.addEventListener("DOMContentLoaded", () => {
+      Prism.highlightAll();
+    });
+  </script>
 </Layout>
