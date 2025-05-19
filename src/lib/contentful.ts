@@ -33,6 +33,7 @@ export interface FilteredPost {
   slug: string;
   date: string;
   tags: string[];
+  rawDate?: Date; // Optional temporary property used for sorting
 }
 
 export async function getAllPosts(): Promise<FilteredPost[]> {
@@ -40,15 +41,25 @@ export async function getAllPosts(): Promise<FilteredPost[]> {
     content_type: "blogPost",
   });
   
-  return entries.items.map((item) => {
+  const posts = entries.items.map((item) => {
     const { title, publishDate, slug, tags } = item.fields;
+    const date = new Date(publishDate);
+    
+    // Format date as YYYY/MM/DD with leading zeros for single-digit day/month
+    const formattedDate = `${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+    
     return {
       title,
       slug,
-      date: new Date(publishDate).toLocaleDateString(),
+      date: formattedDate,
+      rawDate: date, // Keep the raw date for sorting
       tags: tags || []
     };
   });
+  
+  // Sort posts by date in descending order (newest first)
+  return posts.sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime())
+    .map(({ title, slug, date, tags }) => ({ title, slug, date, tags })); // Remove the rawDate property from the final result
 }
 
 export async function getPostsByTag(tag: string): Promise<FilteredPost[]> {

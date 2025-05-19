@@ -51,19 +51,21 @@ export async function getStaticPaths() {
 
     return processedHtml;
   }
-
   const paths = await Promise.all(
-    entries.items.map(async (entry) => ({
-      params: { slug: entry.fields.slug },
-      props: {
-        title: entry.fields.title,
-        date: entry.fields.publishDate,
-        content: addPrismLanguageClasses(
-          await marked.parse(entry.fields.content)
-        ),
-        tags: entry.fields.tags, // Ensure tags are fetched
-      },
-    }))
+    entries.items.map(async (entry) => {
+      const date = new Date(entry.fields.publishDate);
+      return {
+        params: { slug: entry.fields.slug },
+        props: {
+          title: entry.fields.title,
+          date: entry.fields.publishDate, // Keep the original date format for internal use
+          content: addPrismLanguageClasses(
+            await marked.parse(entry.fields.content)
+          ),
+          tags: entry.fields.tags, // Ensure tags are fetched
+        },
+      };
+    })
   );
   return paths;
 }
@@ -84,7 +86,10 @@ const { title, date, content, tags } = Astro.props;
     <h1 class="text-4xl font-bold mb-2">{title}</h1>
     <div class="flex flex-wrap items-center gap-2 mb-2">
       <span class="text-[var(--text-secondary)]">
-        {new Date(date).toLocaleDateString()}| Tags:&nbsp;
+        {new Date(date).getFullYear()}/{
+          (new Date(date).getMonth() + 1).toString().padStart(2, "0")
+        }/{new Date(date).getDate().toString().padStart(2, "0")}&nbsp;|
+        Tags:&nbsp;
       </span>
       {
         Array.isArray(tags) && tags.length > 0 ? (

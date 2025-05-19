@@ -16,7 +16,7 @@ const { posts } = Astro.props;
 <ul class="w-full max-w-2xl">
   {
     posts.map((post) => (
-      <li class="flex items-center py-2">
+      <li class="flex items-center py-4 mb-2">
         <time class="text-sm text-[var(--text-secondary)] min-w-[120px] text-left pr-4">
           {post.date}
         </time>
