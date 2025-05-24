@@ -1,7 +1,6 @@
 name = "notes-kinokonoko-io"
 compatibility_date = "2025-05-24"
 main = "./dist/_worker.js/index.js"
-type = "javascript"
 
 [[routes]]
 pattern = "notes.kinokonoko.io/*"
