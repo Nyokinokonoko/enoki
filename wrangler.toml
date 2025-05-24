@@ -1,5 +1,5 @@
 name = "notes-kinokonoko-io"
-compatibility_date = "2025-05-24"
+compatibility_date = "2025-05-08"
 main = "./dist/_worker.js/index.js"
 
 [[routes]]
@@ -7,7 +7,6 @@ pattern = "notes.kinokonoko.io/*"
 zone_id = "29e34a162ec1b3866014aa906c6e4677"
 
 [assets]
-binding = "ASSETS"
 directory = "./dist"
 
 [observability]
