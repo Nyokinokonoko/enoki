@@ -28,7 +28,7 @@ const { activeCategory, availableCategories } = Astro.props;
         );
       })
     }
-    <div class="slider"></div>
+    <div class="slider init"></div>
   </div>
 </div>
 
@@ -82,6 +82,10 @@ const { activeCategory, availableCategories } = Astro.props;
     transition: all 0.3s ease;
     z-index: 0;
   }
+
+  .slider.init {
+    transition: none;
+  }
 </style>
 
 <script>
@@ -107,12 +111,13 @@ const { activeCategory, availableCategories } = Astro.props;
     }
   }
 
-  // Update slider position on load and after a short delay to ensure DOM is fully rendered
   document.addEventListener("DOMContentLoaded", () => {
+    const slider = document.querySelector(".slider");
     updateSlider();
-    // Run again after a short delay to ensure everything is rendered
-    setTimeout(updateSlider, 100);
+    slider && slider.getBoundingClientRect();
+    slider && slider.classList.remove("init");
   });
+
   window.addEventListener("resize", updateSlider);
 
   // Add click event listeners to category options
