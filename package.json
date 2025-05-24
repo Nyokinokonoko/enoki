@@ -4,7 +4,8 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "set NODE_ENV=production && astro build && node scripts/postbuild.mjs",
+    "build:prod": "set NODE_ENV=production && astro build && node scripts/postbuild.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },

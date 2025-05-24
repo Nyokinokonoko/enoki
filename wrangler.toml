@@ -1,12 +1,14 @@
 name = "notes-kinokonoko-io"
 compatibility_date = "2025-05-24"
-
-[build]
-command = "npm run build"
+main = "./dist/_worker.js/index.js"
 
 [[routes]]
 pattern = "notes.kinokonoko.io/*"
-zone_id = "${CLOUDFLARE_ZONE_ID}"
+zone_id = "29e34a162ec1b3866014aa906c6e4677"
 
 [assets]
+binding = "ASSETS"
 directory = "./dist"
+
+[observability]
+enabled = true
