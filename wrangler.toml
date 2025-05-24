@@ -1,0 +1,9 @@
+name = "notes-kinokonoko-io"
+compatibility_date = "2025-05-24"
+
+[build]
+command = "npm run build"
+
+[[routes]]
+pattern = "notes.kinokonoko.io/*"
+zone_id = "${CLOUDFLARE_ZONE_ID}"
