@@ -10,6 +10,7 @@ export const contentfulClient = contentful.createClient({
 });
 
 export const CATEGORIES = [
+  { id: "all", label: "すべて" },
   { id: "dev", label: "開発メモ" },
   { id: "gadget", label: "ガジェット" },
   { id: "thought", label: "たまに思うことがあるですよ" },
@@ -25,6 +26,7 @@ export interface BlogPost {
         content: EntryFieldTypes.Text;
         publishDate: EntryFieldTypes.Date;
         tags: EntryFieldTypes.Array<EntryFieldTypes.Symbol>;
+        category: EntryFieldTypes.Text;
     }
 }
 
@@ -33,6 +35,7 @@ export interface FilteredPost {
   slug: string;
   date: string;
   tags: string[];
+  category: string;
   rawDate?: Date; // Optional temporary property used for sorting
 }
 
@@ -40,9 +43,8 @@ export async function getAllPosts(): Promise<FilteredPost[]> {
   const entries = await contentfulClient.getEntries<BlogPost>({
     content_type: "blogPost",
   });
-  
-  const posts = entries.items.map((item) => {
-    const { title, publishDate, slug, tags } = item.fields;
+    const posts = entries.items.map((item) => {
+    const { title, publishDate, slug, tags, category } = item.fields;
     const date = new Date(publishDate);
     
     // Format date as YYYY/MM/DD with leading zeros for single-digit day/month
@@ -53,15 +55,50 @@ export async function getAllPosts(): Promise<FilteredPost[]> {
       slug,
       date: formattedDate,
       rawDate: date, // Keep the raw date for sorting
-      tags: tags || []
+      tags: tags || [],
+      category: category || 'other'
     };
   });
   
   // Sort posts by date in descending order (newest first)
   return posts.sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime())
-    .map(({ title, slug, date, tags }) => ({ title, slug, date, tags })); // Remove the rawDate property from the final result
+    .map(({ title, slug, date, tags, category }) => ({ title, slug, date, tags, category })); // Remove the rawDate property from the final result
 }
 
+export async function getPostsByCategory(category: string): Promise<FilteredPost[]> {
+  const allPosts = await getAllPosts();
+  
+  if (!category || category === 'all') {
+    return allPosts;
+  }
+  
+  return allPosts.filter(post => 
+    post.category.toLowerCase() === category.toLowerCase()
+  );
+}
+
+export async function getAvailableCategories(): Promise<Record<string, number>> {
+  const allPosts = await getAllPosts();
+  const categoryCounts: Record<string, number> = {};
+  
+  // Initialize with our predefined categories (excluding "all")
+  CATEGORIES.filter(cat => cat.id !== "all").forEach(category => {
+    categoryCounts[category.id] = 0;
+  });
+  
+  // Count posts for each category
+  allPosts.forEach(post => {
+    const normalizedCategory = post.category.trim().toLowerCase();
+    categoryCounts[normalizedCategory] = (categoryCounts[normalizedCategory] || 0) + 1;
+  });
+  
+  // Add count for "all" category
+  categoryCounts["all"] = allPosts.length;
+  
+  return categoryCounts;
+}
+
+// Backward compatibility functions for tag-based filtering
 export async function getPostsByTag(tag: string): Promise<FilteredPost[]> {
   const allPosts = await getAllPosts();
   
@@ -77,11 +114,6 @@ export async function getPostsByTag(tag: string): Promise<FilteredPost[]> {
 export async function getAvailableTags(): Promise<Record<string, number>> {
   const allPosts = await getAllPosts();
   const tagCounts: Record<string, number> = {};
-  
-  // Initialize with our predefined tags
-  CATEGORIES.forEach(category => {
-    tagCounts[category.id] = 0;
-  });
   
   // Count posts for each tag
   allPosts.forEach(post => {

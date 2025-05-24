@@ -1,23 +1,25 @@
 ---
 import {
   getAllPosts,
-  getPostsByTag,
-  getAvailableTags,
+  getPostsByCategory,
+  getAvailableCategories,
 } from "../lib/contentful";
 import Layout from "../layouts/Layout.astro";
 import BlogList from "../components/BlogList.astro";
 import CategoryToggle from "../components/CategoryToggle.astro";
 
-// Get the active tag from URL query parameter
+// Get the active category from URL query parameter
 const url = new URL(Astro.request.url);
-const activeTag = url.searchParams.get("tag") || "all";
+const activeCategory = url.searchParams.get("category") || "all";
 
-// Get all available tags and their post counts
-const availableTags = await getAvailableTags();
+// Get all available categories and their post counts
+const availableCategories = await getAvailableCategories();
 
-// Get posts filtered by the active tag
+// Get posts filtered by the active category
 const posts =
-  activeTag === "all" ? await getAllPosts() : await getPostsByTag(activeTag);
+  activeCategory === "all"
+    ? await getAllPosts()
+    : await getPostsByCategory(activeCategory);
 ---
 
 <Layout>
@@ -26,7 +28,10 @@ const posts =
   </Fragment>
   <main>
     <div class="flex flex-col items-center">
-      <CategoryToggle activeTag={activeTag} availableTags={availableTags} />
+      <CategoryToggle
+        activeCategory={activeCategory}
+        availableCategories={availableCategories}
+      />
       <BlogList posts={posts} />
     </div>
   </main>

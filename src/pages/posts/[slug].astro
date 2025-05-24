@@ -1,6 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { contentfulClient } from "../../lib/contentful";
+import { contentfulClient, CATEGORIES } from "../../lib/contentful";
 import type { BlogPost } from "../../lib/contentful";
 import { marked } from "marked";
 import "prismjs/themes/prism-tomorrow.css";
@@ -63,6 +63,7 @@ export async function getStaticPaths() {
             await marked.parse(entry.fields.content)
           ),
           tags: entry.fields.tags, // Ensure tags are fetched
+          category: entry.fields.category || "other", // Include category
         },
       };
     })
@@ -70,7 +71,13 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const { title, date, content, tags } = Astro.props;
+const { title, date, content, tags, category } = Astro.props;
+
+// Helper function to get Japanese category label
+function getCategoryLabel(categoryId: string): string {
+  const categoryInfo = CATEGORIES.find((cat) => cat.id === categoryId);
+  return categoryInfo ? categoryInfo.label : categoryId;
+}
 ---
 
 <Layout>
@@ -89,8 +96,16 @@ const { title, date, content, tags } = Astro.props;
         {new Date(date).getFullYear()}/{
           (new Date(date).getMonth() + 1).toString().padStart(2, "0")
         }/{new Date(date).getDate().toString().padStart(2, "0")}&nbsp;|
-        Tags:&nbsp;
+        Category:&nbsp;
       </span>
+      <a
+        href={`/categories/${category}/`}
+        class="underline hover:text-blue-500 text-[var(--text-secondary)]"
+        style="text-underline-offset: 2px; text-decoration-skip-ink: none;"
+      >
+        {getCategoryLabel(category)}
+      </a>
+      <span class="text-[var(--text-secondary)]">&nbsp;| Tags:&nbsp; </span>
       {
         Array.isArray(tags) && tags.length > 0 ? (
           tags.map((tag, i) => (

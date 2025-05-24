@@ -2,22 +2,23 @@
 import { CATEGORIES } from "../lib/contentful";
 
 export interface Props {
-  activeTag: string;
-  availableTags: Record<string, number>;
+  activeCategory: string;
+  availableCategories: Record<string, number>;
 }
 
-const { activeTag, availableTags } = Astro.props;
+const { activeCategory, availableCategories } = Astro.props;
 ---
 
 <div class="category-toggle-container">
   <div class="category-toggle">
     {
       CATEGORIES.map((category) => {
-        const isActive = activeTag === category.id;
-        const isDisabled = availableTags[category.id] === 0;
+        const isActive = activeCategory === category.id;
+        const isDisabled = availableCategories[category.id] === 0;
+        const href = category.id === "all" ? "/" : `/?category=${category.id}`;
         return (
           <a
-            href={isDisabled ? "#" : `/?tag=${category.id}`}
+            href={isDisabled ? "#" : href}
             class={`category-option ${isActive ? "active" : ""} ${isDisabled ? "disabled" : ""}`}
             data-category={category.id}
             aria-disabled={isDisabled}
