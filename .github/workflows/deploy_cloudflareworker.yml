@@ -25,13 +25,10 @@ jobs:
       - name: Install Wrangler CLI
         run: npm install -g wrangler
 
-      - name: Build project
-        run: npm run build
+      - name: Publish to Cloudflare Workers
+        run: wrangler deploy
         env:
           CONTENTFUL_SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           CONTENTFUL_PREVIEW_TOKEN: ${{ secrets.CONTENTFUL_PREVIEW_TOKEN }}
           CONTENTFUL_DELIVERY_TOKEN: ${{ secrets.CONTENTFUL_DELIVERY_TOKEN }}
           NODE_ENV: PROD
-
-      - name: Publish to Cloudflare Workers
-        run: wrangler deploy
