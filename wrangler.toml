@@ -7,3 +7,6 @@ command = "npm run build"
 [[routes]]
 pattern = "notes.kinokonoko.io/*"
 zone_id = "${CLOUDFLARE_ZONE_ID}"
+
+[assets]
+directory = "./dist"
