@@ -1,0 +1,176 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import "../../styles/post.css";
+import { contentfulClient, CATEGORIES } from "../../lib/contentful";
+import type { BlogPost } from "../../lib/contentful";
+import { marked } from "marked";
+import "prismjs/themes/prism-tomorrow.css";
+
+export async function getStaticPaths() {
+  const entries = await contentfulClient.getEntries<BlogPost>({
+    content_type: "blogPost",
+  });
+  function addPrismLanguageClasses(html: string): string {
+    // First, handle code blocks with syntax highlighting
+    let processedHtml = html.replace(
+      /<pre><code( class="[^"]*")?>([\s\S]*?)<\/code><\/pre>/g,
+      (match, classAttr, code) => {
+        let lang: string | null = null;
+
+        const firstLine = code.split("\n")[0];
+        const langMatch = firstLine.match(/^```?([a-zA-Z0-9+-]+)/);
+        if (langMatch) {
+          lang = langMatch[1];
+          code = code.replace(/^```?[a-zA-Z0-9+-]+\n/, "");
+        } else {
+          if (
+            code.includes("function") ||
+            code.includes("const ") ||
+            code.includes("let ")
+          ) {
+            lang = "javascript";
+          } else if (code.includes("#include") || code.includes("int main(")) {
+            lang = "cpp";
+          } else if (
+            code.includes("using System;") ||
+            code.includes("namespace ")
+          ) {
+            lang = "csharp";
+          }
+        }
+
+        const langClass = lang ? ` class="language-${lang}"` : classAttr || "";
+        return `<pre><code${langClass}>${code}</code></pre>`;
+      }
+    );
+
+    // Then, ensure all hyperlinks have underline styling but retain their original color
+    processedHtml = processedHtml.replace(
+      /<a(.*?)href="(.*?)"(.*?)>(.*?)<\/a>/g,
+      '<a$1href="$2"$3 style="text-decoration: underline; text-underline-offset: 2px; text-decoration-skip-ink: none; color: inherit;">$4</a>'
+    );
+
+    return processedHtml;
+  }
+  const paths = await Promise.all(
+    entries.items.map(async (entry) => {
+      const date = new Date(entry.fields.publishDate);
+      return {
+        params: { slug: entry.fields.slug },
+        props: {
+          title: entry.fields.title,
+          date: entry.fields.publishDate, // Keep the original date format for internal use
+          content: addPrismLanguageClasses(
+            await marked.parse(entry.fields.content)
+          ),
+          tags: entry.fields.tags, // Ensure tags are fetched
+          category: entry.fields.category || "other", // Include category
+        },
+      };
+    })
+  );
+  return paths;
+}
+
+const { title, date, content, tags, category } = Astro.props;
+
+// Helper function to get Japanese category label
+function getCategoryLabel(categoryId: string): string {
+  const categoryInfo = CATEGORIES.find((cat) => cat.id === categoryId);
+  return categoryInfo ? categoryInfo.label : categoryId;
+}
+---
+
+<Layout>
+  <Fragment slot="head">
+    <title>{title} | notes.kinokonoko.io</title>
+    <!-- Import Prism CSS in the head -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css"
+    />
+  </Fragment>
+  <main class="main-post">
+    <a href="/" class="back-link">← Back to posts</a>
+    <h1 class="post-title">{title}</h1>
+    <div class="post-date">
+      {new Date(date).getFullYear()}/{
+        (new Date(date).getMonth() + 1).toString().padStart(2, "0")
+      }/{new Date(date).getDate().toString().padStart(2, "0")}&nbsp;|
+      Category:&nbsp;
+      <a
+        href={`/categories/${category}/`}
+        class="underline hover:text-blue-500"
+        style="text-underline-offset: 2px; text-decoration-skip-ink: none;"
+      >
+        {getCategoryLabel(category)}
+      </a>
+      &nbsp;| Tags:&nbsp;
+      {
+        Array.isArray(tags) && tags.length > 0 ? (
+          tags.map((tag, i) => (
+            <>
+              <a
+                href={`/tags/${encodeURIComponent(tag.trim().toLowerCase())}/`}
+                class="underline hover:text-blue-500"
+                style="text-underline-offset: 2px; text-decoration-skip-ink: none;"
+              >
+                {tag}
+              </a>
+              {i < tags.length - 1 && <span>,&nbsp</span>}
+            </>
+          ))
+        ) : (
+          <span>None</span>
+        )
+      }
+    </div>
+    <article class="post-content" set:html={content} />
+  </main>
+  <!-- Load Prism.js and language components for client-side syntax highlighting -->
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-csharp.min.js"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-c.min.js"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-cpp.min.js"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-objectivec.min.js"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-swift.min.js"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"
+  ></script>
+  <script is:inline>
+    // Run highlighting once the DOM is fully loaded
+    document.addEventListener("DOMContentLoaded", () => {
+      Prism.highlightAll();
+    });
+  </script>
+</Layout>

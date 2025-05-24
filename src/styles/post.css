@@ -1,0 +1,47 @@
+/* Styles for posts/[slug].astro */
+html, body {
+  /* make sure nothing ever pushes the window wider than the screen */
+  max-width: 100%;
+  overflow-x: hidden;
+}
+.main-post {
+  max-width: 48rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+.back-link {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  display: inline-block;
+}
+.back-link:hover {
+  text-decoration: underline;
+}
+.post-title {
+  font-size: 2.25rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.post-date {
+  color: var(--text-secondary);
+}
+.post-content {
+  margin-top: 2rem;
+}
+/* ===================================================================
+   2) Keep your Prism blocks scrollable inside themselves only
+   =================================================================== */
+pre[class*="language-"] {
+  display: block;               /* normal block formatting */
+  box-sizing: border-box;       /* include padding in the 100% width */
+  width: 100%;                  /* never exceed its container */
+  max-width: 100%;              /* extra safety belt */
+  
+  white-space: pre;             /* preserve code formatting */
+  overflow-x: auto;             /* horizontal scrollbar *inside* the <pre> */
+  -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
+}

@@ -1,0 +1,39 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getAllPosts, getPostsByTag } from "../../lib/contentful";
+import BlogList from "../../components/BlogList.astro";
+
+export async function getStaticPaths() {
+  // Get all unique tags from all blog posts
+  const allPosts = await getAllPosts();
+  const tagSet = new Set<string>();
+
+  allPosts.forEach((post) => {
+    post.tags.forEach((tag) => tagSet.add(tag.trim().toLowerCase()));
+  });
+
+  // Encode tags for URL safety
+  return Array.from(tagSet).map((tag) => ({
+    params: { tag: encodeURIComponent(tag) },
+  }));
+}
+
+const tag = (Astro.params.tag || "").toLowerCase();
+const posts = await getPostsByTag(tag);
+---
+
+<Layout>
+  <Fragment slot="head">
+    <title>「{tag}」タグの投稿一覧 | notes.kinokonoko.io</title>
+  </Fragment>
+  <main class="container max-w-3xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-4">「{tag}」タグの投稿一覧</h1>
+    {
+      posts.length === 0 ? (
+        <p>このタグに該当する投稿はありません。</p>
+      ) : (
+        <BlogList posts={posts} />
+      )
+    }
+  </main>
+</Layout>

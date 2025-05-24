@@ -1,0 +1,99 @@
+---
+import { CATEGORIES } from "../lib/contentful";
+import "../styles/category-toggle.css";
+
+export interface Props {
+  activeCategory: string;
+  availableCategories: Record<string, number>;
+}
+
+const { activeCategory, availableCategories } = Astro.props;
+---
+
+<div class="category-toggle-container">
+  <div class="category-toggle">
+    {
+      CATEGORIES.map((category) => {
+        const isActive = activeCategory === category.id;
+        const isDisabled = availableCategories[category.id] === 0;
+        const href = category.id === "all" ? "/" : `/?category=${category.id}`;
+        return (
+          <a
+            href={isDisabled ? "#" : href}
+            class={`category-option ${isActive ? "active" : ""} ${isDisabled ? "disabled" : ""}`}
+            data-category={category.id}
+            aria-disabled={isDisabled}
+          >
+            {category.label}
+          </a>
+        );
+      })
+    }
+    <div class="slider init"></div>
+  </div>
+</div>
+
+<script>
+  // Calculate initial position for the slider
+  function updateSlider() {
+    const activeOption = document.querySelector(
+      ".category-option.active"
+    ) as HTMLElement;
+    const slider = document.querySelector(".slider") as HTMLElement;
+
+    if (activeOption && slider) {
+      slider.style.width = `${activeOption.offsetWidth}px`;
+      slider.style.left = `${activeOption.offsetLeft}px`;
+    } else if (slider) {
+      // If no active option is found, default to the first option
+      const firstOption = document.querySelector(
+        ".category-option"
+      ) as HTMLElement;
+      if (firstOption) {
+        slider.style.width = `${firstOption.offsetWidth}px`;
+        slider.style.left = `${firstOption.offsetLeft}px`;
+      }
+    }
+  }
+  // Initialize the slider position when the DOM is loaded
+  document.addEventListener("DOMContentLoaded", () => {
+    const slider = document.querySelector(".slider");
+    updateSlider(); // Set initial position based on active category
+    slider && slider.getBoundingClientRect(); // Force layout calculation
+    slider && slider.classList.remove("init"); // Enable smooth transitions
+  });
+
+  window.addEventListener("resize", updateSlider);
+
+  // Add click event listeners to category options
+  document.addEventListener("DOMContentLoaded", () => {
+    const options = document.querySelectorAll(".category-option");
+    options.forEach((option) => {
+      option.addEventListener("click", (e) => {
+        const clickedOption = e.currentTarget as HTMLElement;
+
+        // Don't do anything if the option is disabled
+        if (
+          clickedOption.classList.contains("disabled") ||
+          clickedOption.getAttribute("aria-disabled") === "true"
+        ) {
+          e.preventDefault();
+          return;
+        }
+
+        // Update the slider position
+        const slider = document.querySelector(".slider") as HTMLElement;
+        if (slider) {
+          slider.style.width = `${clickedOption.offsetWidth}px`;
+          slider.style.left = `${clickedOption.offsetLeft}px`;
+        }
+
+        // Remove active class from all options
+        options.forEach((opt) => opt.classList.remove("active"));
+
+        // Add active class to clicked option
+        clickedOption.classList.add("active");
+      });
+    });
+  });
+</script>

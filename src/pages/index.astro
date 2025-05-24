@@ -1,0 +1,40 @@
+---
+// Ensure category selector works depending on parameters
+export const prerender = false;
+
+import {
+  getAllPosts,
+  getPostsByCategory,
+  getAvailableCategories,
+} from "../lib/contentful";
+import Layout from "../layouts/Layout.astro";
+import BlogList from "../components/BlogList.astro";
+import CategoryToggle from "../components/CategoryToggle.astro";
+// Get the active category from URL query parameter
+const url = new URL(Astro.request.url);
+const activeCategory = url.searchParams.get("category") || "all";
+
+// Get all available categories and their post counts
+const availableCategories = await getAvailableCategories();
+
+// Get posts filtered by the active category
+const posts =
+  activeCategory === "all"
+    ? await getAllPosts()
+    : await getPostsByCategory(activeCategory);
+---
+
+<Layout>
+  <Fragment slot="head">
+    <title>notes.kinokonoko.io</title>
+  </Fragment>
+  <main>
+    <div class="flex flex-col items-center">
+      <CategoryToggle
+        activeCategory={activeCategory}
+        availableCategories={availableCategories}
+      />
+      <BlogList posts={posts} />
+    </div>
+  </main>
+</Layout>

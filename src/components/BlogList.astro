@@ -1,0 +1,30 @@
+---
+import "../styles/bloglist.css";
+
+export interface BlogPost {
+  title: string;
+  slug: string;
+  date: string;
+  tags?: string[];
+  category: string;
+}
+
+export interface Props {
+  posts: BlogPost[];
+}
+
+const { posts } = Astro.props;
+---
+
+<ul class="blog-list">
+  {
+    posts.map((post, index) => (
+      <li class="blog-list-item">
+        <time class="blog-list-date">{post.date}</time>
+        <a href={`/posts/${post.slug}/`} class="blog-list-title">
+          {post.title}
+        </a>
+      </li>
+    ))
+  }
+</ul>
