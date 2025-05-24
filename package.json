@@ -20,6 +20,7 @@
   "devDependencies": {
     "@astrojs/cloudflare": "^12.5.3",
     "@tailwindcss/typography": "^0.5.16",
-    "@types/prismjs": "^1.26.5"
+    "@types/prismjs": "^1.26.5",
+    "terser": "^5.39.2"
   }
 }
