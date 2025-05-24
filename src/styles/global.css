@@ -6,11 +6,10 @@
   --background: #ffffff;
   --text: #111827;
   --text-secondary: #4b5563;
-  --card-bg: rgba(255, 255, 255, 1);
-  --card-bg-alt: rgba(248, 250, 252, 1);
+  --card-bg: rgba(255, 255, 255, 1);  --card-bg-alt: rgba(248, 250, 252, 1);
   --hover-bg: rgba(255, 255, 255, 0.55);
   --border: white;
-  --gradient-button: linear-gradient(83.21deg, #3245ff 0%, #bc52ee 100%);
+  --gradient-button: linear-gradient(83.21deg, #d4a700 0%, #b8860b 100%);
   --gradient-text: linear-gradient(14deg, #d83333 0%, #f041ff 100%);
   --gradient-code-bg: linear-gradient(66.77deg, #f3cddd 0%, #f5cee7 100%);
   --gradient-code-border: linear-gradient(155deg, #d83333 0%, #f041ff 18%, #f5cee7 45%);
@@ -20,11 +19,10 @@ html.dark {
   --background: #1D1F21;
   --text: #f1f5f9;
   --text-secondary: #cbd5e1;
-  --card-bg: rgba(30, 41, 59, 1);
-  --card-bg-alt: rgba(51, 65, 85, 0.5);
+  --card-bg: rgba(30, 41, 59, 1);  --card-bg-alt: rgba(51, 65, 85, 0.5);
   --hover-bg: rgba(30, 41, 59, 0.7);
   --border: #334155;
-  --gradient-button: linear-gradient(83.21deg, #3245ff 0%, #bc52ee 100%);
+  --gradient-button: linear-gradient(83.21deg, #d4a700 0%, #b8860b 100%);
   --gradient-text: linear-gradient(14deg, #ff6b6b 0%, #f041ff 100%);
   --gradient-code-bg: linear-gradient(66.77deg, #2d1b29 0%, #2b1a30 100%);
   --gradient-code-border: linear-gradient(155deg, #d83333 0%, #f041ff 18%, #7e4e79 45%);
