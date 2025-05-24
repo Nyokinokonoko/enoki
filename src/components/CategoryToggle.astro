@@ -110,12 +110,12 @@ const { activeCategory, availableCategories } = Astro.props;
       }
     }
   }
-
+  // Initialize the slider position when the DOM is loaded
   document.addEventListener("DOMContentLoaded", () => {
     const slider = document.querySelector(".slider");
-    updateSlider();
-    slider && slider.getBoundingClientRect();
-    slider && slider.classList.remove("init");
+    updateSlider(); // Set initial position based on active category
+    slider && slider.getBoundingClientRect(); // Force layout calculation
+    slider && slider.classList.remove("init"); // Enable smooth transitions
   });
 
   window.addEventListener("resize", updateSlider);
