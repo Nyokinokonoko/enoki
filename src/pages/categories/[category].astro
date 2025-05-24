@@ -3,9 +3,11 @@ import Layout from "../../layouts/Layout.astro";
 import {
   getAllPosts,
   getPostsByCategory,
+  getAvailableCategories,
   CATEGORIES,
 } from "../../lib/contentful";
 import BlogList from "../../components/BlogList.astro";
+import CategoryToggle from "../../components/CategoryToggle.astro";
 
 export async function getStaticPaths() {
   // Generate paths for all predefined categories except "all"
@@ -17,6 +19,9 @@ export async function getStaticPaths() {
 const category = (Astro.params.category || "").toLowerCase();
 const posts = await getPostsByCategory(category);
 
+// Get all available categories and their post counts for the toggle
+const availableCategories = await getAvailableCategories();
+
 // Find the category label for display
 const categoryInfo = CATEGORIES.find((cat) => cat.id === category);
 const categoryLabel = categoryInfo ? categoryInfo.label : category;
@@ -26,16 +31,21 @@ const categoryLabel = categoryInfo ? categoryInfo.label : category;
   <Fragment slot="head">
     <title>「{categoryLabel}」カテゴリの投稿一覧 | notes.kinokonoko.io</title>
   </Fragment>
-  <main class="container max-w-3xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-4">
-      「{categoryLabel}」カテゴリの投稿一覧
-    </h1>
-    {
-      posts.length === 0 ? (
-        <p>このカテゴリに該当する投稿はありません。</p>
-      ) : (
-        <BlogList posts={posts} />
-      )
-    }
+  <main>
+    <div class="flex flex-col items-center">
+      <CategoryToggle
+        activeCategory={category}
+        availableCategories={availableCategories}
+      />
+      {
+        posts.length === 0 ? (
+          <p class="text-center mt-8">
+            このカテゴリに該当する投稿はありません。
+          </p>
+        ) : (
+          <BlogList posts={posts} />
+        )
+      }
+    </div>
   </main>
 </Layout>

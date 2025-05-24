@@ -16,7 +16,7 @@ const { activeCategory, availableCategories } = Astro.props;
       CATEGORIES.map((category) => {
         const isActive = activeCategory === category.id;
         const isDisabled = availableCategories[category.id] === 0;
-        const href = category.id === "all" ? "/" : `/?category=${category.id}`;
+        const href = category.id === "all" ? "/" : `/categories/${category.id}`;
         return (
           <a
             href={isDisabled ? "#" : href}
@@ -55,6 +55,7 @@ const { activeCategory, availableCategories } = Astro.props;
       }
     }
   }
+
   // Initialize the slider position when the DOM is loaded
   document.addEventListener("DOMContentLoaded", () => {
     const slider = document.querySelector(".slider");
@@ -64,36 +65,4 @@ const { activeCategory, availableCategories } = Astro.props;
   });
 
   window.addEventListener("resize", updateSlider);
-
-  // Add click event listeners to category options
-  document.addEventListener("DOMContentLoaded", () => {
-    const options = document.querySelectorAll(".category-option");
-    options.forEach((option) => {
-      option.addEventListener("click", (e) => {
-        const clickedOption = e.currentTarget as HTMLElement;
-
-        // Don't do anything if the option is disabled
-        if (
-          clickedOption.classList.contains("disabled") ||
-          clickedOption.getAttribute("aria-disabled") === "true"
-        ) {
-          e.preventDefault();
-          return;
-        }
-
-        // Update the slider position
-        const slider = document.querySelector(".slider") as HTMLElement;
-        if (slider) {
-          slider.style.width = `${clickedOption.offsetWidth}px`;
-          slider.style.left = `${clickedOption.offsetLeft}px`;
-        }
-
-        // Remove active class from all options
-        options.forEach((opt) => opt.classList.remove("active"));
-
-        // Add active class to clicked option
-        clickedOption.classList.add("active");
-      });
-    });
-  });
 </script>
