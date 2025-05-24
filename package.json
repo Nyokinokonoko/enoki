@@ -4,8 +4,8 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "set NODE_ENV=production && astro build && node scripts/postbuild.mjs",
-    "build:prod": "set NODE_ENV=production && astro build && node scripts/postbuild.mjs",
+    "build": "set NODE_ENV=production && astro build",
+    "build:prod": "set NODE_ENV=production && astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -18,7 +18,6 @@
     "tailwindcss": "^4.1.6"
   },
   "devDependencies": {
-    "@astrojs/cloudflare": "^12.5.3",
     "@tailwindcss/typography": "^0.5.16",
     "@types/prismjs": "^1.26.5",
     "terser": "^5.39.2"
