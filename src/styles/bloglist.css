@@ -1,0 +1,75 @@
+/* Styles for BlogList.astro */
+.blog-list {
+  width: 100%;
+  max-width: 80%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem; /* equivalent to space-y-1 */
+}
+
+.blog-list-item {
+  display: flex;
+  align-items: center;
+  height: 45px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.blog-list-item:nth-child(odd) {
+  background-color: var(--card-bg-alt);
+}
+
+.blog-list-item:hover {
+  background-color: var(--hover-bg);
+}
+
+.blog-list-date {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  min-width: 120px;
+  text-align: left;
+  padding-right: 1rem;
+  flex-shrink: 0;
+}
+
+.blog-list-title {
+  font-size: 1rem;
+  color: var(--text);
+  text-decoration: none;
+  transition: text-decoration 0.2s ease;
+}
+
+.blog-list-title:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-skip-ink: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .blog-list {
+    max-width: 100%;
+  }
+  
+  .blog-list-item {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    height: auto;
+    min-height: 45px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+  
+  .blog-list-date {
+    min-width: auto;
+    padding-right: 0;
+    font-size: 0.75rem;
+  }
+}

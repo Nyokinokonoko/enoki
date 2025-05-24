@@ -1,5 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import "../../styles/post.css";
 import { contentfulClient, CATEGORIES } from "../../lib/contentful";
 import type { BlogPost } from "../../lib/contentful";
 import { marked } from "marked";
@@ -89,48 +90,42 @@ function getCategoryLabel(categoryId: string): string {
       href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css"
     />
   </Fragment>
-  <main class="container max-w-3xl mx-auto px-4 py-8">
-    <h1 class="text-4xl font-bold mb-2">{title}</h1>
-    <div class="flex flex-wrap items-center gap-2 mb-2">
-      <span class="text-[var(--text-secondary)]">
-        {new Date(date).getFullYear()}/{
-          (new Date(date).getMonth() + 1).toString().padStart(2, "0")
-        }/{new Date(date).getDate().toString().padStart(2, "0")}&nbsp;|
-        Category:&nbsp;
-      </span>
+  <main class="main-post">
+    <a href="/" class="back-link">← Back to posts</a>
+    <h1 class="post-title">{title}</h1>
+    <div class="post-date">
+      {new Date(date).getFullYear()}/{
+        (new Date(date).getMonth() + 1).toString().padStart(2, "0")
+      }/{new Date(date).getDate().toString().padStart(2, "0")}&nbsp;|
+      Category:&nbsp;
       <a
         href={`/categories/${category}/`}
-        class="underline hover:text-blue-500 text-[var(--text-secondary)]"
+        class="underline hover:text-blue-500"
         style="text-underline-offset: 2px; text-decoration-skip-ink: none;"
       >
         {getCategoryLabel(category)}
       </a>
-      <span class="text-[var(--text-secondary)]">&nbsp;| Tags:&nbsp; </span>
+      &nbsp;| Tags:&nbsp;
       {
         Array.isArray(tags) && tags.length > 0 ? (
           tags.map((tag, i) => (
             <>
               <a
                 href={`/tags/${encodeURIComponent(tag.trim().toLowerCase())}/`}
-                class="underline hover:text-blue-500 text-[var(--text-secondary)]"
+                class="underline hover:text-blue-500"
                 style="text-underline-offset: 2px; text-decoration-skip-ink: none;"
               >
                 {tag}
               </a>
-              {i < tags.length - 1 && (
-                <span class="text-[var(--text-secondary)]">,&nbsp</span>
-              )}
+              {i < tags.length - 1 && <span>,&nbsp</span>}
             </>
           ))
         ) : (
-          <span class="text-[var(--text-secondary)]">None</span>
+          <span>None</span>
         )
       }
     </div>
-    <article
-      class="mt-8 prose prose-sm md:prose-base dark:prose-invert"
-      set:html={content}
-    />
+    <article class="post-content" set:html={content} />
   </main>
   <!-- Load Prism.js and language components for client-side syntax highlighting -->
   <script

@@ -1,4 +1,6 @@
 ---
+import "../styles/bloglist.css";
+
 export interface BlogPost {
   title: string;
   slug: string;
@@ -14,17 +16,12 @@ export interface Props {
 const { posts } = Astro.props;
 ---
 
-<ul class="w-full max-w-2xl">
+<ul class="blog-list">
   {
-    posts.map((post) => (
-      <li class="flex items-center py-4 mb-2">
-        <time class="text-sm text-[var(--text-secondary)] min-w-[120px] text-left pr-4">
-          {post.date}
-        </time>
-        <a
-          href={`/posts/${post.slug}/`}
-          class="hover:underline text-[var(--text-primary)] text-base"
-        >
+    posts.map((post, index) => (
+      <li class="blog-list-item">
+        <time class="blog-list-date">{post.date}</time>
+        <a href={`/posts/${post.slug}/`} class="blog-list-title">
           {post.title}
         </a>
       </li>

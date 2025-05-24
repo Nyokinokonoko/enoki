@@ -2,13 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "./navbar.css";
-
 :root {
   --background: #ffffff;
   --text: #111827;
   --text-secondary: #4b5563;
   --card-bg: rgba(255, 255, 255, 1);
+  --card-bg-alt: rgba(248, 250, 252, 1);
   --hover-bg: rgba(255, 255, 255, 0.55);
   --border: white;
   --gradient-button: linear-gradient(83.21deg, #3245ff 0%, #bc52ee 100%);
@@ -22,6 +21,7 @@ html.dark {
   --text: #f1f5f9;
   --text-secondary: #cbd5e1;
   --card-bg: rgba(30, 41, 59, 1);
+  --card-bg-alt: rgba(51, 65, 85, 0.5);
   --hover-bg: rgba(30, 41, 59, 0.7);
   --border: #334155;
   --gradient-button: linear-gradient(83.21deg, #3245ff 0%, #bc52ee 100%);

@@ -59,7 +59,6 @@
     top: 100%;
     left: 0;
     right: 0;
-    width: 100vw;
     min-width: 0;
     background: var(--background-secondary, #222);
     flex-direction: column;
