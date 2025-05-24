@@ -1,7 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
-import cloudflare from "@astrojs/cloudflare";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -34,5 +33,5 @@ export default defineConfig({
     },
   },
 
-  adapter: cloudflare(),
+  site: "https://notes.kinokonoko.io",
 });
