@@ -4,3 +4,7 @@ interface ImportMetaEnv {
   readonly CONTENTFUL_PREVIEW_TOKEN: string;
   readonly NODE_ENV: string;
 }
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
