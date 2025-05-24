@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature/initialSetup
   workflow_dispatch:
 
 jobs:
