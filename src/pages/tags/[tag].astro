@@ -53,6 +53,7 @@ const displayTag = tagName || decodeURIComponent(tag);
   description={`「${displayTag}」タグが付けられた技術記事と開発ノートの一覧です。`}
   ogType="website"
   ogImage={ogImagePath}
+  noindex={true}
 >
   <main class="container max-w-3xl mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold mb-4">「{displayTag}」タグの投稿一覧</h1>

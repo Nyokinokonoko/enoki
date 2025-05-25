@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
+Allow: /posts/
+Disallow: /categories/
+Disallow: /tags/
+Disallow: /rss/
+Disallow: /rss.xml
+Disallow: /sitemap.xml
 
 Sitemap: https://notes.kinokonoko.io/sitemap.xml
