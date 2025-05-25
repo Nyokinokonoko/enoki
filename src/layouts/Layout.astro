@@ -63,18 +63,51 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, siteUrl).href;
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content="notes.kinokonoko.io" />
     <meta property="og:locale" content="ja_JP" />
-    <meta property="og:image" content={new URL(ogImage, siteUrl).href} />    <!-- Twitter Card Meta Tags -->
+    <meta property="og:image" content={new URL(ogImage, siteUrl).href} />
+    <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content={twitterCard} />
     <meta name="twitter:title" content={ogTitle} />
     <meta name="twitter:description" content={ogDescription} />
     <meta name="twitter:image" content={new URL(ogImage, siteUrl).href} />
-
     <!-- RSS Feed Links -->
-    <link rel="alternate" type="application/rss+xml" title="notes.kinokonoko.io" href="/rss.xml" />
-    <link rel="alternate" type="application/rss+xml" title="開発メモ | notes.kinokonoko.io" href="/rss/dev.xml" />
-    <link rel="alternate" type="application/rss+xml" title="ガジェット | notes.kinokonoko.io" href="/rss/gadget.xml" />
-    <link rel="alternate" type="application/rss+xml" title="たまに思うことがあるですよ | notes.kinokonoko.io" href="/rss/thought.xml" />
-    <link rel="alternate" type="application/rss+xml" title="その他 | notes.kinokonoko.io" href="/rss/other.xml" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="notes.kinokonoko.io"
+      href="/rss.xml"
+    />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="開発メモ | notes.kinokonoko.io"
+      href="/rss/dev.xml"
+    />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="ガジェット | notes.kinokonoko.io"
+      href="/rss/gadget.xml"
+    />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="たまに思うことがあるですよ | notes.kinokonoko.io"
+      href="/rss/thought.xml"
+    />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="その他 | notes.kinokonoko.io"
+      href="/rss/other.xml"
+    />
+
+    <!-- Sitemap -->
+    <link
+      rel="sitemap"
+      type="application/xml"
+      title="Sitemap"
+      href="/sitemap.xml"
+    />
 
     <slot name="head" />
   </head>

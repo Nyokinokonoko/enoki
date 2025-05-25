@@ -21,6 +21,8 @@ This is the frontend for my personal blog, featuring a clean and responsive desi
 - 📱 Responsive design with modern UI
 - ⚡ Fast loading with Astro's static generation
 - 🌐 Global CDN delivery via Cloudflare
+- 🗺️ Automatic sitemap generation for SEO
+- 📡 RSS feeds for all categories and tags
 
 ## Content Categories
 
