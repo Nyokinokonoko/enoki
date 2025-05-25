@@ -40,6 +40,11 @@ export interface FilteredPost {
   rawDate?: Date; // Optional temporary property used for sorting
 }
 
+export interface DetailedPost extends FilteredPost {
+  content: string;
+  metaDescription: string;
+}
+
 export async function getAllPosts(): Promise<FilteredPost[]> {
   const entries = await contentfulClient.getEntries<BlogPost>({
     content_type: "blogPost",
@@ -125,4 +130,76 @@ export async function getAvailableTags(): Promise<Record<string, number>> {
   });
   
   return tagCounts;
+}
+
+export async function getPostDetails(slug: string): Promise<DetailedPost | null> {
+  const entries = await contentfulClient.getEntries<BlogPost>({
+    content_type: "blogPost",
+    "fields.slug": slug,
+  });
+  
+  const item = entries.items[0];
+  if (!item) {
+    return null;
+  }
+  
+  const { title, publishDate, slug: postSlug, tags, category, content, metaDescription } = item.fields;
+  const date = new Date(publishDate);
+  
+  // Format date as YYYY/MM/DD with leading zeros for single-digit day/month
+  const formattedDate = `${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+  
+  return {
+    title,
+    slug: postSlug,
+    date: formattedDate,
+    rawDate: date, // Keep the raw date for sorting
+    tags: tags || [],
+    category: category || 'other',
+    content: content || '',
+    metaDescription: metaDescription || '',
+  };
+}
+
+export async function getAllPostsWithContent(): Promise<DetailedPost[]> {
+  const entries = await contentfulClient.getEntries<BlogPost>({
+    content_type: "blogPost",
+  });
+  
+  const posts = entries.items.map((item) => {
+    const { title, publishDate, slug, tags, category, content, metaDescription } = item.fields;
+    const date = new Date(publishDate);
+    
+    // Format date as YYYY/MM/DD with leading zeros for single-digit day/month
+    const formattedDate = `${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+    
+    return {
+      title,
+      slug,
+      date: formattedDate,
+      rawDate: date, // Keep the raw date for sorting
+      tags: tags || [],
+      category: category || 'other',
+      content: content || '',
+      metaDescription: metaDescription || `${title} - Read this blog post on notes.kinokonoko.io`
+    };
+  });
+  
+  // Sort posts by date in descending order (newest first)
+  return posts.sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime())
+    .map(({ title, slug, date, tags, category, content, metaDescription }) => ({ 
+      title, slug, date, tags, category, content, metaDescription 
+    })); // Remove the rawDate property from the final result
+}
+
+export async function getPostsByCategoryWithContent(category: string): Promise<DetailedPost[]> {
+  const allPosts = await getAllPostsWithContent();
+  
+  if (!category || category === 'all') {
+    return allPosts;
+  }
+  
+  return allPosts.filter(post => 
+    post.category.toLowerCase() === category.toLowerCase()
+  );
 }
