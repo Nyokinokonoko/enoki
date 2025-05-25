@@ -4,17 +4,20 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "set NODE_ENV=production && astro build",
-    "build:prod": "set NODE_ENV=production && astro build",
+    "build": "npm run og:generate && set NODE_ENV=production && astro build",
+    "build:prod": "npm run og:generate && set NODE_ENV=production && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "og:generate": "node scripts/generate-og-images.js"
   },
   "dependencies": {
     "@contentful/rich-text-html-renderer": "^17.0.0",
+    "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/vite": "^4.1.6",
     "astro": "^5.8.0",
     "contentful": "^11.5.22",
     "marked": "^15.0.11",
+    "satori": "^0.13.1",
     "tailwindcss": "^4.1.6"
   },
   "devDependencies": {
