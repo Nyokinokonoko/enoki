@@ -14,10 +14,11 @@ const availableCategories = await getAvailableCategories();
 const posts = await getAllPosts();
 ---
 
-<Layout>
-  <Fragment slot="head">
-    <title>notes.kinokonoko.io</title>
-  </Fragment>
+<Layout
+  title="notes.kinokonoko.io"
+  description="Personal technical notes and blog posts covering programming, development, and technology insights."
+  ogType="website"
+>
   <main>
     <div class="flex flex-col items-center">
       <CategoryToggle

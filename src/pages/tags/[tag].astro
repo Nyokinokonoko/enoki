@@ -22,10 +22,11 @@ const tag = (Astro.params.tag || "").toLowerCase();
 const posts = await getPostsByTag(tag);
 ---
 
-<Layout>
-  <Fragment slot="head">
-    <title>「{tag}」タグの投稿一覧 | notes.kinokonoko.io</title>
-  </Fragment>
+<Layout
+  title={`「${tag}」タグの投稿一覧 | notes.kinokonoko.io`}
+  description={`「${tag}」タグが付けられた技術記事と開発ノートの一覧です。`}
+  ogType="website"
+>
   <main class="container max-w-3xl mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold mb-4">「{tag}」タグの投稿一覧</h1>
     {

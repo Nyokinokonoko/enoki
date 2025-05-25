@@ -27,10 +27,11 @@ const categoryInfo = CATEGORIES.find((cat) => cat.id === category);
 const categoryLabel = categoryInfo ? categoryInfo.label : category;
 ---
 
-<Layout>
-  <Fragment slot="head">
-    <title>「{categoryLabel}」カテゴリの投稿一覧 | notes.kinokonoko.io</title>
-  </Fragment>
+<Layout
+  title={`「${categoryLabel}」カテゴリの投稿一覧 | notes.kinokonoko.io`}
+  description={`「${categoryLabel}」カテゴリに関連する技術記事と開発ノートの一覧です。`}
+  ogType="website"
+>
   <main>
     <div class="flex flex-col items-center">
       <CategoryToggle

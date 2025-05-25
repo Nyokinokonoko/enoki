@@ -55,6 +55,7 @@ export async function getStaticPaths() {
   const paths = await Promise.all(
     entries.items.map(async (entry) => {
       const date = new Date(entry.fields.publishDate);
+
       return {
         params: { slug: entry.fields.slug },
         props: {
@@ -65,6 +66,9 @@ export async function getStaticPaths() {
           ),
           tags: entry.fields.tags, // Ensure tags are fetched
           category: entry.fields.category || "other", // Include category
+          metaDescription:
+            entry.fields.metaDescription ||
+            `${entry.fields.title} - Read this blog post on notes.kinokonoko.io`,
         },
       };
     })
@@ -72,7 +76,7 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const { title, date, content, tags, category } = Astro.props;
+const { title, date, content, tags, category, metaDescription } = Astro.props;
 
 // Helper function to get Japanese category label
 function getCategoryLabel(categoryId: string): string {
@@ -81,9 +85,13 @@ function getCategoryLabel(categoryId: string): string {
 }
 ---
 
-<Layout>
+<Layout
+  title={`${title} | notes.kinokonoko.io`}
+  description={metaDescription}
+  ogType="article"
+  ogImage="/og-article.jpg"
+>
   <Fragment slot="head">
-    <title>{title} | notes.kinokonoko.io</title>
     <!-- Import Prism CSS in the head -->
     <link
       rel="stylesheet"
