@@ -8,8 +8,7 @@
     "build:prod": "set NODE_ENV=production && astro build",
     "build:dev": "set NODE_ENV=development && astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "og:generate": "node scripts/generate-og-images.js"
+    "astro": "astro"
   },
   "dependencies": {
     "@contentful/rich-text-html-renderer": "^17.0.0",
