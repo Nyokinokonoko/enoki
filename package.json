@@ -4,8 +4,9 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "npm run og:generate && set NODE_ENV=production && astro build",
-    "build:prod": "npm run og:generate && set NODE_ENV=production && astro build",
+    "build": "set NODE_ENV=production && astro build",
+    "build:prod": "set NODE_ENV=production && astro build",
+    "build:dev": "set NODE_ENV=development && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "og:generate": "node scripts/generate-og-images.js"
