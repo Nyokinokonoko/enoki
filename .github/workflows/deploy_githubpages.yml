@@ -41,7 +41,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y fonts-noto-cjk
-          fc-list | grep "Noto Sans JP"
 
       - name: Build site
         run: npm run build
