@@ -2,6 +2,33 @@
 import "../styles/global.css";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
+
+export interface Props {
+  title: string;
+  description: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  ogType?: string;
+  twitterCard?: string;
+  canonical?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  ogTitle = title,
+  ogDescription = description,
+  ogImage = "/og-default.jpg",
+  ogType = "website",
+  twitterCard = "summary_large_image",
+  canonical,
+  noindex = false,
+} = Astro.props;
+
+const siteUrl = "https://notes.kinokonoko.io";
+const canonicalUrl = canonical || new URL(Astro.url.pathname, siteUrl).href;
 ---
 
 <!doctype html>
@@ -9,7 +36,13 @@ import Footer from "../components/Footer.astro";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1a1a1a" />
+    <!-- Favicon and Icons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -17,7 +50,29 @@ import Footer from "../components/Footer.astro";
       rel="stylesheet"
     />
     <meta name="generator" content={Astro.generator} />
-    <slot name="head" />  </head>
+
+    <!-- SEO Meta Tags -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={ogTitle} />
+    <meta property="og:description" content={ogDescription} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content="notes.kinokonoko.io" />
+    <meta property="og:image" content={new URL(ogImage, siteUrl).href} />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content={twitterCard} />
+    <meta name="twitter:title" content={ogTitle} />
+    <meta name="twitter:description" content={ogDescription} />
+    <meta name="twitter:image" content={new URL(ogImage, siteUrl).href} />
+
+    <slot name="head" />
+  </head>
   <body>
     <div class="min-h-screen flex flex-col">
       <Navbar />

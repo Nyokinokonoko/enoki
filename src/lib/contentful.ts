@@ -24,6 +24,7 @@ export interface BlogPost {
         slug: EntryFieldTypes.Text;
         heroImage?: EntryFieldTypes.AssetLink;
         content: EntryFieldTypes.Text;
+        metaDescription: EntryFieldTypes.Text;
         publishDate: EntryFieldTypes.Date;
         tags: EntryFieldTypes.Array<EntryFieldTypes.Symbol>;
         category: EntryFieldTypes.Text;

@@ -3,6 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import "../../styles/post.css";
 import { contentfulClient, CATEGORIES } from "../../lib/contentful";
 import type { BlogPost } from "../../lib/contentful";
+import { generatePostOGImage } from "../../lib/og-generator";
 import { marked } from "marked";
 import "prismjs/themes/prism-tomorrow.css";
 
@@ -55,6 +56,22 @@ export async function getStaticPaths() {
   const paths = await Promise.all(
     entries.items.map(async (entry) => {
       const date = new Date(entry.fields.publishDate);
+
+      // Generate OG image for this blog post
+      let ogImagePath: string;
+      try {
+        ogImagePath = await generatePostOGImage(
+          entry.fields.slug,
+          entry.fields.title
+        );
+      } catch (error) {
+        console.error(
+          `Failed to generate OG image for ${entry.fields.slug}:`,
+          error
+        );
+        ogImagePath = "/og-article.jpg"; // Fallback to static image
+      }
+
       return {
         params: { slug: entry.fields.slug },
         props: {
@@ -65,6 +82,10 @@ export async function getStaticPaths() {
           ),
           tags: entry.fields.tags, // Ensure tags are fetched
           category: entry.fields.category || "other", // Include category
+          metaDescription:
+            entry.fields.metaDescription ||
+            `${entry.fields.title} - Read this blog post on notes.kinokonoko.io`,
+          ogImagePath, // Pass the generated OG image path
         },
       };
     })
@@ -72,7 +93,8 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const { title, date, content, tags, category } = Astro.props;
+const { title, date, content, tags, category, metaDescription, ogImagePath } =
+  Astro.props;
 
 // Helper function to get Japanese category label
 function getCategoryLabel(categoryId: string): string {
@@ -81,9 +103,13 @@ function getCategoryLabel(categoryId: string): string {
 }
 ---
 
-<Layout>
+<Layout
+  title={`${title} | notes.kinokonoko.io`}
+  description={metaDescription}
+  ogType="article"
+  ogImage={ogImagePath}
+>
   <Fragment slot="head">
-    <title>{title} | notes.kinokonoko.io</title>
     <!-- Import Prism CSS in the head -->
     <link
       rel="stylesheet"

@@ -1,6 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import { getAllPosts, getPostsByTag } from "../../lib/contentful";
+import { generateTagOGImage } from "../../lib/og-generator";
 import BlogList from "../../components/BlogList.astro";
 
 export async function getStaticPaths() {
@@ -12,22 +13,49 @@ export async function getStaticPaths() {
     post.tags.forEach((tag) => tagSet.add(tag.trim().toLowerCase()));
   });
 
-  // Encode tags for URL safety
-  return Array.from(tagSet).map((tag) => ({
-    params: { tag: encodeURIComponent(tag) },
-  }));
+  // Generate paths with OG images for each tag
+  const paths = await Promise.all(
+    Array.from(tagSet).map(async (tag) => {
+      // Generate OG image for this tag
+      let ogImagePath: string;
+      try {
+        ogImagePath = await generateTagOGImage(tag);
+      } catch (error) {
+        console.error(`Failed to generate OG image for tag ${tag}:`, error);
+        ogImagePath = "/og-article.jpg"; // Fallback to static image
+      }
+
+      return {
+        params: { tag: encodeURIComponent(tag) },
+        props: {
+          tagName: tag,
+          ogImagePath,
+        },
+      };
+    })
+  );
+
+  return paths;
 }
 
 const tag = (Astro.params.tag || "").toLowerCase();
 const posts = await getPostsByTag(tag);
+
+// Get props from static generation
+const { tagName, ogImagePath } = Astro.props;
+
+// Use tagName from props if available, otherwise decode from params
+const displayTag = tagName || decodeURIComponent(tag);
 ---
 
-<Layout>
-  <Fragment slot="head">
-    <title>「{tag}」タグの投稿一覧 | notes.kinokonoko.io</title>
-  </Fragment>
+<Layout
+  title={`「${displayTag}」タグの投稿一覧 | notes.kinokonoko.io`}
+  description={`「${displayTag}」タグが付けられた技術記事と開発ノートの一覧です。`}
+  ogType="website"
+  ogImage={ogImagePath}
+>
   <main class="container max-w-3xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-4">「{tag}」タグの投稿一覧</h1>
+    <h1 class="text-3xl font-bold mb-4">「{displayTag}」タグの投稿一覧</h1>
     {
       posts.length === 0 ? (
         <p>このタグに該当する投稿はありません。</p>

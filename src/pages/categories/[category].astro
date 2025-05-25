@@ -6,14 +6,40 @@ import {
   getAvailableCategories,
   CATEGORIES,
 } from "../../lib/contentful";
+import { generateCategoryOGImage } from "../../lib/og-generator";
 import BlogList from "../../components/BlogList.astro";
 import CategoryToggle from "../../components/CategoryToggle.astro";
 
 export async function getStaticPaths() {
   // Generate paths for all predefined categories except "all"
-  return CATEGORIES.filter((cat) => cat.id !== "all").map((category) => ({
-    params: { category: category.id },
-  }));
+  const paths = await Promise.all(
+    CATEGORIES.filter((cat) => cat.id !== "all").map(async (category) => {
+      // Generate OG image for this category
+      let ogImagePath: string;
+      try {
+        ogImagePath = await generateCategoryOGImage(
+          category.id,
+          category.label
+        );
+      } catch (error) {
+        console.error(
+          `Failed to generate OG image for category ${category.id}:`,
+          error
+        );
+        ogImagePath = "/og-article.jpg"; // Fallback to static image
+      }
+
+      return {
+        params: { category: category.id },
+        props: {
+          categoryId: category.id,
+          categoryLabel: category.label,
+          ogImagePath,
+        },
+      };
+    })
+  );
+  return paths;
 }
 
 const category = (Astro.params.category || "").toLowerCase();
@@ -22,15 +48,24 @@ const posts = await getPostsByCategory(category);
 // Get all available categories and their post counts for the toggle
 const availableCategories = await getAvailableCategories();
 
-// Find the category label for display
-const categoryInfo = CATEGORIES.find((cat) => cat.id === category);
-const categoryLabel = categoryInfo ? categoryInfo.label : category;
+// Get props from static generation
+const { categoryId, categoryLabel, ogImagePath } = Astro.props;
+
+// Find the category label for display (fallback if props are missing)
+const displayLabel =
+  categoryLabel ||
+  (() => {
+    const categoryInfo = CATEGORIES.find((cat) => cat.id === category);
+    return categoryInfo ? categoryInfo.label : category;
+  })();
 ---
 
-<Layout>
-  <Fragment slot="head">
-    <title>「{categoryLabel}」カテゴリの投稿一覧 | notes.kinokonoko.io</title>
-  </Fragment>
+<Layout
+  title={`「${displayLabel}」カテゴリの投稿一覧 | notes.kinokonoko.io`}
+  description={`「${displayLabel}」カテゴリに関連する技術記事と開発ノートの一覧です。`}
+  ogType="website"
+  ogImage={ogImagePath}
+>
   <main>
     <div class="flex flex-col items-center">
       <CategoryToggle
