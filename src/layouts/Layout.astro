@@ -50,6 +50,17 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, siteUrl).href;
       rel="stylesheet"
     />
     <meta name="generator" content={Astro.generator} />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WWZ28EE6XE"
+    ></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-WWZ28EE6XE");
+    </script>
 
     <!-- SEO Meta Tags -->
     <title>{title}</title>
