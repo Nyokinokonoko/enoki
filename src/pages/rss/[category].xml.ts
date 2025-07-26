@@ -2,17 +2,16 @@ import rss from '@astrojs/rss';
 import { getPostsByCategoryWithContent, CATEGORIES } from '../../lib/contentful';
 import type { APIContext } from 'astro';
 
-export async function getStaticPaths() {
-  // Generate RSS feeds for each category except "all"
-  return CATEGORIES.filter(cat => cat.id !== 'all').map(category => ({
-    params: { category: category.id },
-    props: { categoryLabel: category.label }
-  }));
-}
-
 export async function GET(context: APIContext) {
   const { category } = context.params;
-  const { categoryLabel } = context.props;
+  
+  // Find the category info
+  const categoryInfo = CATEGORIES.find(cat => cat.id === category);
+  if (!categoryInfo) {
+    return new Response('Category not found', { status: 404 });
+  }
+  
+  const categoryLabel = categoryInfo.label;
   
   if (!category || typeof category !== 'string') {
     return new Response('Category not found', { status: 404 });

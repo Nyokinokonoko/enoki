@@ -4,48 +4,31 @@ import { getAllPosts, getPostsByTag } from "../../lib/contentful";
 import { generateTagOGImage } from "../../lib/og-generator";
 import BlogList from "../../components/BlogList.astro";
 
-export async function getStaticPaths() {
-  // Get all unique tags from all blog posts
-  const allPosts = await getAllPosts();
-  const tagSet = new Set<string>();
+// Get the tag from the URL params
+const tag = decodeURIComponent(Astro.params.tag || "").toLowerCase();
 
-  allPosts.forEach((post) => {
-    post.tags.forEach((tag) => tagSet.add(tag.trim().toLowerCase()));
-  });
-
-  // Generate paths with OG images for each tag
-  const paths = await Promise.all(
-    Array.from(tagSet).map(async (tag) => {
-      // Generate OG image for this tag
-      let ogImagePath: string;
-      try {
-        ogImagePath = await generateTagOGImage(tag);
-      } catch (error) {
-        console.error(`Failed to generate OG image for tag ${tag}:`, error);
-        ogImagePath = "/og-article.jpg"; // Fallback to static image
-      }
-
-      return {
-        params: { tag: encodeURIComponent(tag) },
-        props: {
-          tagName: tag,
-          ogImagePath,
-        },
-      };
-    })
-  );
-
-  return paths;
+if (!tag) {
+  return Astro.redirect("/404");
 }
 
-const tag = (Astro.params.tag || "").toLowerCase();
+// Get posts for this tag
 const posts = await getPostsByTag(tag);
 
-// Get props from static generation
-const { tagName, ogImagePath } = Astro.props;
+// If no posts found for this tag, redirect to 404
+if (posts.length === 0) {
+  return Astro.redirect("/404");
+}
 
-// Use tagName from props if available, otherwise decode from params
-const displayTag = tagName || decodeURIComponent(tag);
+// Generate OG image for this tag
+let ogImagePath: string;
+try {
+  ogImagePath = await generateTagOGImage(tag);
+} catch (error) {
+  console.error(`Failed to generate OG image for tag ${tag}:`, error);
+  ogImagePath = "/og-article.jpg"; // Fallback to static image
+}
+
+const displayTag = tag;
 ---
 
 <Layout

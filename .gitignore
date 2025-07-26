@@ -15,7 +15,9 @@ pnpm-debug.log*
 
 # environment variables
 .env
+.env.*
 .env.production
+env
 
 # macOS-specific files
 .DS_Store
@@ -26,3 +28,4 @@ pnpm-debug.log*
 # generated OG images (built at deploy time)
 public/og/
 public/og-article.jpg
+.vercel

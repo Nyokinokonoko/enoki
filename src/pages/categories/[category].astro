@@ -10,54 +10,35 @@ import { generateCategoryOGImage } from "../../lib/og-generator";
 import BlogList from "../../components/BlogList.astro";
 import CategoryToggle from "../../components/CategoryToggle.astro";
 
-export async function getStaticPaths() {
-  // Generate paths for all predefined categories except "all"
-  const paths = await Promise.all(
-    CATEGORIES.filter((cat) => cat.id !== "all").map(async (category) => {
-      // Generate OG image for this category
-      let ogImagePath: string;
-      try {
-        ogImagePath = await generateCategoryOGImage(
-          category.id,
-          category.label
-        );
-      } catch (error) {
-        console.error(
-          `Failed to generate OG image for category ${category.id}:`,
-          error
-        );
-        ogImagePath = "/og-article.jpg"; // Fallback to static image
-      }
+// Get the category from the URL params
+const category = (Astro.params.category || "").toLowerCase();
 
-      return {
-        params: { category: category.id },
-        props: {
-          categoryId: category.id,
-          categoryLabel: category.label,
-          ogImagePath,
-        },
-      };
-    })
-  );
-  return paths;
+// Validate category exists
+const categoryInfo = CATEGORIES.find((cat) => cat.id === category);
+if (!categoryInfo && category !== "all") {
+  return Astro.redirect("/404");
 }
 
-const category = (Astro.params.category || "").toLowerCase();
+// Get posts for this category
 const posts = await getPostsByCategory(category);
 
 // Get all available categories and their post counts for the toggle
 const availableCategories = await getAvailableCategories();
 
-// Get props from static generation
-const { categoryId, categoryLabel, ogImagePath } = Astro.props;
+// Generate OG image for this category
+let ogImagePath: string;
+try {
+  ogImagePath = await generateCategoryOGImage(
+    category,
+    categoryInfo?.label || category
+  );
+} catch (error) {
+  console.error(`Failed to generate OG image for category ${category}:`, error);
+  ogImagePath = "/og-article.jpg"; // Fallback to static image
+}
 
-// Find the category label for display (fallback if props are missing)
-const displayLabel =
-  categoryLabel ||
-  (() => {
-    const categoryInfo = CATEGORIES.find((cat) => cat.id === category);
-    return categoryInfo ? categoryInfo.label : category;
-  })();
+// Get display label
+const displayLabel = categoryInfo?.label || category;
 ---
 
 <Layout
