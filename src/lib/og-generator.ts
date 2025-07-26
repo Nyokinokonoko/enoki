@@ -1,7 +1,6 @@
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
-import { mkdir, writeFile, readFile } from 'fs/promises';
-import { existsSync } from 'fs';
+import { readFile } from 'fs/promises';
 import path from 'path';
 
 /**
@@ -254,20 +253,17 @@ function createOGTemplate(title: string, subtitle?: string) {  const hasSubtitle
 }
 
 /**
- * Generate OG image with actual SVG-to-PNG conversion
+ * Generate OG image and return as data URL for serverless environments
  */
 export async function generateOGImage(
   title: string, 
-  subtitle?: string,
-  outputPath?: string
+  subtitle?: string
 ): Promise<string> {
-  if (!outputPath) {
-    throw new Error('Output path is required for OG image generation');
-  }
-
   try {
     // Create the SVG template
-    const template = createOGTemplate(title, subtitle);    // Generate SVG using satori
+    const template = createOGTemplate(title, subtitle);
+    
+    // Generate SVG using satori
     const [regularFont, boldFont] = await Promise.all([
       getFontData(400),
       getFontData(700)
@@ -303,21 +299,13 @@ export async function generateOGImage(
     // Convert SVG to PNG using resvg
     const resvg = new Resvg(svg);
     const pngData = resvg.render();
-    const pngBuffer = pngData.asPng();    // Ensure output directory exists
-    const fullOutputPath = path.join('dist', outputPath);
-    const outputDir = path.dirname(fullOutputPath);
+    const pngBuffer = pngData.asPng();
     
-    if (!existsSync(outputDir)) {
-      await mkdir(outputDir, { recursive: true });
-    }
-
-    // Write the PNG file
-    await writeFile(fullOutputPath, pngBuffer);
-    
-    console.log(`Generated OG image: ${fullOutputPath}`);
-    return `/${outputPath}`;
+    // Return as data URL
+    const base64 = Buffer.from(pngBuffer).toString('base64');
+    return `data:image/png;base64,${base64}`;
   } catch (error) {
-    console.error(`Failed to generate OG image for ${outputPath}:`, error);
+    console.error(`Failed to generate OG image:`, error);
     // Return a fallback path if generation fails
     return '/og-article.jpg';
   }
@@ -355,37 +343,29 @@ async function getFontData(weight: 400 | 700): Promise<ArrayBuffer> {
  * Generate OG image for blog post
  */
 export async function generatePostOGImage(slug: string, title: string): Promise<string> {
-  const outputPath = `og/posts/${slug}.png`;
-  await generateOGImage(title, 'notes.kinokonoko.io', outputPath);
-  return `/${outputPath}`;
+  return await generateOGImage(title, 'notes.kinokonoko.io');
 }
 
 /**
  * Generate OG image for category page
  */
 export async function generateCategoryOGImage(category: string, categoryLabel: string): Promise<string> {
-  const outputPath = `og/categories/${category}.png`;
-  await generateOGImage(categoryLabel, 'notes.kinokonoko.io', outputPath);
-  return `/${outputPath}`;
+  return await generateOGImage(categoryLabel, 'notes.kinokonoko.io');
 }
 
 /**
  * Generate OG image for tag page
  */
 export async function generateTagOGImage(tag: string): Promise<string> {
-  const outputPath = `og/tags/${tag}.png`;
   const tagTitle = `「${tag}」タグの投稿一覧`;
-  await generateOGImage(tagTitle, 'notes.kinokonoko.io', outputPath);
-  return `/${outputPath}`;
+  return await generateOGImage(tagTitle, 'notes.kinokonoko.io');
 }
 
 /**
  * Generate OG image for home page
  */
 export async function generateHomeOGImage(): Promise<string> {
-  const outputPath = 'og/home.png';
-  await generateOGImage('notes.kinokonoko.io', '', outputPath);
-  return `/${outputPath}`;
+  return await generateOGImage('notes.kinokonoko.io', '');
 }
 
 // Export the template function for the build script
