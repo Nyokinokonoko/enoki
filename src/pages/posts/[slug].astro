@@ -7,94 +7,87 @@ import { generatePostOGImage } from "../../lib/og-generator";
 import { marked } from "marked";
 import "prismjs/themes/prism-tomorrow.css";
 
-export async function getStaticPaths() {
-  const entries = await contentfulClient.getEntries<BlogPost>({
-    content_type: "blogPost",
-  });
-  function addPrismLanguageClasses(html: string): string {
-    // First, handle code blocks with syntax highlighting
-    let processedHtml = html.replace(
-      /<pre><code( class="[^"]*")?>([\s\S]*?)<\/code><\/pre>/g,
-      (match, classAttr, code) => {
-        let lang: string | null = null;
+// Helper function to add Prism language classes
+function addPrismLanguageClasses(html: string): string {
+  // First, handle code blocks with syntax highlighting
+  let processedHtml = html.replace(
+    /<pre><code( class="[^"]*")?>([\s\S]*?)<\/code><\/pre>/g,
+    (match, classAttr, code) => {
+      let lang: string | null = null;
 
-        const firstLine = code.split("\n")[0];
-        const langMatch = firstLine.match(/^```?([a-zA-Z0-9+-]+)/);
-        if (langMatch) {
-          lang = langMatch[1];
-          code = code.replace(/^```?[a-zA-Z0-9+-]+\n/, "");
-        } else {
-          if (
-            code.includes("function") ||
-            code.includes("const ") ||
-            code.includes("let ")
-          ) {
-            lang = "javascript";
-          } else if (code.includes("#include") || code.includes("int main(")) {
-            lang = "cpp";
-          } else if (
-            code.includes("using System;") ||
-            code.includes("namespace ")
-          ) {
-            lang = "csharp";
-          }
+      const firstLine = code.split("\n")[0];
+      const langMatch = firstLine.match(/^```?([a-zA-Z0-9+-]+)/);
+      if (langMatch) {
+        lang = langMatch[1];
+        code = code.replace(/^```?[a-zA-Z0-9+-]+\n/, "");
+      } else {
+        if (
+          code.includes("function") ||
+          code.includes("const ") ||
+          code.includes("let ")
+        ) {
+          lang = "javascript";
+        } else if (code.includes("#include") || code.includes("int main(")) {
+          lang = "cpp";
+        } else if (
+          code.includes("using System;") ||
+          code.includes("namespace ")
+        ) {
+          lang = "csharp";
         }
-
-        const langClass = lang ? ` class="language-${lang}"` : classAttr || "";
-        return `<pre><code${langClass}>${code}</code></pre>`;
-      }
-    );
-
-    // Then, ensure all hyperlinks have underline styling but retain their original color
-    processedHtml = processedHtml.replace(
-      /<a(.*?)href="(.*?)"(.*?)>(.*?)<\/a>/g,
-      '<a$1href="$2"$3 style="text-decoration: underline; text-underline-offset: 2px; text-decoration-skip-ink: none; color: inherit;">$4</a>'
-    );
-
-    return processedHtml;
-  }
-  const paths = await Promise.all(
-    entries.items.map(async (entry) => {
-      const date = new Date(entry.fields.publishDate);
-
-      // Generate OG image for this blog post
-      let ogImagePath: string;
-      try {
-        ogImagePath = await generatePostOGImage(
-          entry.fields.slug,
-          entry.fields.title
-        );
-      } catch (error) {
-        console.error(
-          `Failed to generate OG image for ${entry.fields.slug}:`,
-          error
-        );
-        ogImagePath = "/og-article.jpg"; // Fallback to static image
       }
 
-      return {
-        params: { slug: entry.fields.slug },
-        props: {
-          title: entry.fields.title,
-          date: entry.fields.publishDate, // Keep the original date format for internal use
-          content: addPrismLanguageClasses(
-            await marked.parse(entry.fields.content)
-          ),
-          tags: entry.fields.tags, // Ensure tags are fetched
-          category: entry.fields.category || "other", // Include category
-          metaDescription:
-            entry.fields.metaDescription ||
-            `${entry.fields.title} - Read this blog post on notes.kinokonoko.io`,
-          ogImagePath, // Pass the generated OG image path
-        },
-      };
-    })
+      const langClass = lang ? ` class="language-${lang}"` : classAttr || "";
+      return `<pre><code${langClass}>${code}</code></pre>`;
+    }
   );
-  return paths;
+
+  // Then, ensure all hyperlinks have underline styling but retain their original color
+  processedHtml = processedHtml.replace(
+    /<a(.*?)href="(.*?)"(.*?)>(.*?)<\/a>/g,
+    '<a$1href="$2"$3 style="text-decoration: underline; text-underline-offset: 2px; text-decoration-skip-ink: none; color: inherit;">$4</a>'
+  );
+
+  return processedHtml;
 }
 
-const { title, date, content, tags, category, metaDescription, ogImagePath } =
-  Astro.props;
+// Get the slug from the URL params
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect("/404");
+}
+
+// Fetch the specific post data
+const entry = await contentfulClient.getEntries<BlogPost>({
+  content_type: "blogPost",
+  "fields.slug": slug,
+  limit: 1,
+});
+
+if (!entry.items.length) {
+  return Astro.redirect("/404");
+}
+
+const post = entry.items[0];
+
+// Generate OG image for this blog post
+let ogImagePath: string;
+try {
+  ogImagePath = await generatePostOGImage(post.fields.slug, post.fields.title);
+} catch (error) {
+  console.error(`Failed to generate OG image for ${slug}:`, error);
+  ogImagePath = "/og-article.jpg"; // Fallback to static image
+}
+
+// Prepare the post data
+const title = post.fields.title;
+const date = post.fields.publishDate;
+const content = addPrismLanguageClasses(await marked.parse(post.fields.content));
+const tags = post.fields.tags;
+const category = post.fields.category || "other";
+const metaDescription = post.fields.metaDescription || `${title} - Read this blog post on notes.kinokonoko.io`;
+
 
 // Helper function to get Japanese category label
 function getCategoryLabel(categoryId: string): string {
