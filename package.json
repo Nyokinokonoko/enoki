@@ -4,9 +4,9 @@
   "version": "1.1.0",
   "scripts": {
     "dev": "astro dev",
-    "build": "set NODE_ENV=production && astro build",
-    "build:prod": "set NODE_ENV=production && astro build",
-    "build:dev": "set NODE_ENV=development && astro build",
+    "build": "cross-env NODE_ENV=production astro build",
+    "build:prod": "cross-env NODE_ENV=production astro build",
+    "build:dev": "cross-env NODE_ENV=development astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",
     "@types/prismjs": "^1.26.5",
+    "cross-env": "^7.0.3",
     "terser": "^5.39.2"
   }
 }
