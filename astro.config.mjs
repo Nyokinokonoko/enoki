@@ -1,11 +1,15 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
+import vercel from "@astrojs/vercel";
 
 const isProduction = process.env.NODE_ENV === "production";
 
 // https://astro.build/config
 export default defineConfig({
+  output: "server",
+  adapter: vercel(),
+
   vite: {
     define: {
       "import.meta.env.NODE_ENV": JSON.stringify(
@@ -14,7 +18,7 @@ export default defineConfig({
     },
     plugins: [tailwindcss()],
     build: {
-      sourcemap: !isProduction, // Only include source maps in development
+      sourcemap: !isProduction,
       minify: isProduction ? "terser" : false,
       ...(isProduction && {
         terserOptions: {
