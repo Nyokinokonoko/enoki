@@ -26,3 +26,4 @@ pnpm-debug.log*
 # generated OG images (built at deploy time)
 public/og/
 public/og-article.jpg
+.vercel
